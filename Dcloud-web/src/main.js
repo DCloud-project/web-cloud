@@ -18,7 +18,11 @@ Vue.use(ElementUI)
 Vue.config.productionTip = false
 import echarts from 'echarts'
 Vue.prototype.$echarts = echarts
-
+Vue.prototype.config = {
+    headers: {
+        "Content-Type": "application/json"
+    }
+}
 new Vue({
     el: '#app',
     router,

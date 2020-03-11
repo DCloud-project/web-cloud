@@ -4,7 +4,7 @@
       class="login-form"
       autocomplete="on"
       :model="loginForm"
-      :rules="loginRules"
+      :rules="rule"
       ref="loginForm"
       label-position="left"
     >
@@ -15,7 +15,7 @@
       <div>
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="密码登录" name="1"></el-tab-pane>
-          <el-tab-pane label="短信验证码登录" name="2"></el-tab-pane>
+          <el-tab-pane label="验证码登录" name="2"></el-tab-pane>
         </el-tabs>
       </div>
       <el-form-item prop="username">
@@ -25,7 +25,7 @@
           type="text"
           v-model="loginForm.username"
           autocomplete="on"
-          placeholder="请输入手机号码"
+          placeholder="请输入邮箱"
         ></el-input>
       </el-form-item>
 
@@ -55,7 +55,13 @@
             />
           </el-col>
           <el-col :span="8" :offset="1">
-            <el-button type="primary" plain>获取验证码</el-button>
+            <el-button
+              type="primary"
+              plain
+              :disabled="isDisabled"
+              @click="getMessage()"
+              id="dyMobileButton"
+            >{{butName}}</el-button>
           </el-col>
         </el-row>
       </el-form-item>
@@ -72,6 +78,7 @@
 </template>
 
 <script>
+import qs from "qs";
 export default {
   data() {
     return {
@@ -81,23 +88,48 @@ export default {
         message: ""
       },
       loginRules: {
-        username: [
-          { required: true, trigger: "blur", message: "请输入手机号" }
-        ],
-        password: [{ required: true, trigger: "blur", message: "请输入密码" }],
+        username: [{ required: true, trigger: "blur", message: "请输入邮箱" }],
+        password: [{ required: true, trigger: "blur", message: "请输入密码" }]
+      },
+      loginRules1: {
+        username: [{ required: true, trigger: "blur", message: "请输入邮箱" }],
         message: [{ required: true, trigger: "blur", message: "请输入验证码" }]
       },
       passwordType: "password",
       loading: false,
-      activeName: "1"
+      activeName: "1",
+      rule: "",
+      butName: "获取验证码",
+      isDisabled: false
     };
+  },
+  created() {
+    this.rule = this.loginRules;
   },
   methods: {
     handleClick(tab, event) {
       if (this.activeName == "2") {
+        this.rule = this.loginRules1;
         //验证码登录
       } else {
+        this.rule = this.loginRules;
       }
+    },
+    getMessage() {
+      var time = 60;
+      //倒计时
+      let timer = setInterval(() => {
+        if (time == 0) {
+          clearInterval(timer);
+          this.isDisabled = false;
+          this.butName = "获取验证码";
+        } else {
+          this.butName = time + "秒后重试";
+          this.isDisabled = true;
+          time--;
+        }
+      }, 1000);
+    
     },
     showPwd() {
       if (this.passwordType === "password") {
@@ -107,35 +139,42 @@ export default {
       }
     },
     handleLogin() {
-      localStorage.setItem("roles", 'superAdmin');
+      console.log(this.config);
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true;
-          if (this.activeName == "1") {//密码登录
-            this.$axios
-              .post(
-                "/baseUrl/api/mymanage/admin?username=" +
-                  this.loginForm.username +
-                  "&password=" +
-                  this.loginForm.password
-              )
-              .then(res => {
-                if (res.data.respcode == "1000") {
-                  //登录成功
-                  this.loading = false;
-                  localStorage.setItem("roles", 'superAdmin');
-                  localStorage.setItem("isLogin", true);
-                  this.$router.push("/home");
-                } else {
-                  this.$alert(
-                    "账号或密码错误，请重新选择或者输入",
-                    "登录失败",
-                    {
-                      confirmButtonText: "确定"
-                    }
-                  );
+          if (this.activeName == "1") {
+            //密码登录
+            var data = {
+              email: this.username,
+              password: this.password
+            };
+            // let config = {
+            //   headers: {
+            //     "Content-Type": "application/json"
+            //   }
+            // };
+            this.$axios.post("/api/loginByPassword", data, this.config).then(res => {
+              if (res.data == "2") {
+                //登录成功
+                if (res.data.role == "1") {
+                  localStorage.setItem("roles", "superAdmin");
                 }
-              });
+                var date = new Date();
+                localStorage.setItem("loginTime", date.getTime); //登录时间
+                this.loading = false;
+                localStorage.setItem("isLogin", true);
+                this.$router.push("/home");
+              } else if (res.data == "0") {
+                this.$alert("账号不存在", "登录失败", {
+                  confirmButtonText: "确定"
+                });
+              } else {
+                this.$alert("账号或密码错误，请重新选择或者输入", "登录失败", {
+                  confirmButtonText: "确定"
+                });
+              }
+            });
           } else {
             //验证码登录
           }
@@ -144,9 +183,9 @@ export default {
         }
       });
     },
-    signup(){
-      console.log("ooo")
-       this.$router.push("/signup");
+    signup() {
+      console.log("ooo");
+      this.$router.push("/signup");
     }
   }
 };
