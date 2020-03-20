@@ -12,7 +12,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://xnvprw.natappfree.cc', //设置你调用的接口域名和端口号
+                target: 'http://bsxk83.natappfree.cc', //设置你调用的接口域名和端口号
                 changeOrigin: true,
                    //跨域
                 pathRewrite: {

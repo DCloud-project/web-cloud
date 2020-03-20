@@ -24,7 +24,7 @@
           </el-upload>
           <!-- </el-form-item> -->
           <el-form-item label="账号">
-            <el-input v-model="ruleForm.tel" disabled></el-input>
+            <el-input v-model="ruleForm.email" disabled></el-input>
           </el-form-item>
           <el-form-item label="昵称" prop="name">
             <el-input v-model="ruleForm.name" placeholder="请输入昵称"></el-input>
@@ -111,7 +111,7 @@ export default {
     };
     return {
       ruleForm: {
-        tel: "",
+        email: "",
         name: "",
         sex: "1",
         type: 1,
@@ -377,7 +377,7 @@ export default {
           this.ruleForm.username = res.data.username;
           this.ruleForm.name = res.data.name;
           this.ruleForm.sex = res.data.sex.toString();
-          this.ruleForm.phone = res.data.tel;
+          this.ruleForm.phone = res.data.email;
         });
     },
     submitForm(formName) {
@@ -391,7 +391,7 @@ export default {
                 this.ruleForm.name +
                 "&sex=" +
                 this.ruleForm.sex +
-                "&tel=" +
+                "&email=" +
                 this.ruleForm.phone
             )
             .then(res => {

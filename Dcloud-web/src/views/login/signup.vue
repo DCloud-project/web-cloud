@@ -1,5 +1,7 @@
 <template>
   <div class="login-container">
+    <!-- <div class="login-form"> -->
+    <!-- <el-row> -->
     <el-form
       class="login-form"
       autocomplete="on"
@@ -19,10 +21,19 @@
           type="text"
           v-model="loginForm.username"
           autocomplete="on"
-          placeholder="请输入手机号码"
+          placeholder="请输入邮箱"
         ></el-input>
       </el-form-item>
-
+      <!-- </el-form> -->
+      <!-- </el-row> -->
+      <!-- <el-row> -->
+      <!-- <el-form
+          autocomplete="on"
+          :model="loginForm"
+          :rules="loginRules"
+          ref="loginForm"
+          label-position="left"
+      >-->
       <el-form-item prop="message">
         <el-row>
           <el-col :span="15">
@@ -35,11 +46,34 @@
             />
           </el-col>
           <el-col :span="8" :offset="1">
-            <el-button type="primary" plain>获取验证码</el-button>
+            <el-button
+              type="primary"
+              plain
+              :disabled="isDisabled"
+              @click="getMessage()"
+              id="dyMobileButton"
+            >{{butName}}</el-button>
           </el-col>
         </el-row>
       </el-form-item>
-
+      <el-form-item prop="pass">
+        <el-input
+          prefix-icon="el-icon-lock"
+          type="password"
+          v-model="loginForm.pass"
+          autocomplete="off"
+          placeholder="请输入密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item prop="checkPass">
+        <el-input
+          prefix-icon="el-icon-finished"
+          type="password"
+          v-model="loginForm.checkPass"
+          autocomplete="off"
+          placeholder="请确认密码"
+        ></el-input>
+      </el-form-item>
       <el-button
         type="primary"
         style="width:100%;margin-bottom:10px;"
@@ -48,15 +82,29 @@
       >注册</el-button>
       <el-link type="primary" style="float:right" @click="login">已有账号，去登录</el-link>
     </el-form>
+    <!-- </el-row> -->
+    <!-- </div> -->
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!/^1[3456789]\d{9}$/.test(value)) {
-        callback(new Error("手机号码格式不正确"));
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.loginForm.checkPass !== "") {
+          this.$refs.loginForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.loginForm.pass) {
+        callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
       }
@@ -64,23 +112,93 @@ export default {
     return {
       loginForm: {
         username: "",
-        message: ""
+        message: "",
+        pass: "",
+        checkPass: ""
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", validator: validateUsername }
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          {
+            type: "email",
+            message: "请输入正确的邮箱",
+            trigger: ["blur", "change"]
+          }
         ],
-        message: [{ required: true, trigger: "blur", message: "请输入验证码" }]
+        message: [{ required: true, trigger: "blur", message: "请输入验证码" }],
+        pass: [{ required: true, validator: validatePass, trigger: "blur" }],
+        checkPass: [
+          { required: true, validator: validatePass2, trigger: "blur" }
+        ]
       },
       loading: false,
-      activeName: "1"
+      activeName: "1",
+      butName: "获取验证码",
+      isDisabled: false,
+      validateCode: ""
     };
   },
   methods: {
+    getMessage() {
+      var time = 60;
+      this.$refs.loginForm.validateField("username", errMsg => {
+        if (errMsg) {
+        } else {
+          var data = {
+            email: this.loginForm.username
+          };
+          this.$axios.post("/api/sendCode", data, this.config).then(res => {
+            localStorage.setItem("validateCode", res.data);
+          });
+
+          //倒计时
+          let timer = setInterval(() => {
+            if (time == 0) {
+              clearInterval(timer);
+              this.isDisabled = false;
+              this.butName = "获取验证码";
+            } else {
+              this.butName = time + "秒后重试";
+              this.isDisabled = true;
+              time--;
+            }
+          }, 1000);
+        }
+      });
+    },
     signup() {
+      var flag = false;
+      var flag1 = false;
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
+          if (localStorage.getItem("validateCode") != this.loginForm.message) {
+            this.$alert("验证码错误，请重新输入", "注册失败", {
+              confirmButtonText: "确定"
+            });
+          } else {
+            this.loading = true;
+            var data = {
+              email: this.loginForm1.username,
+              password: this.loginForm.pass
+            };
+            this.$axios.post("/api/register", data, this.config).then(res => {
+              this.loading = false;
+              if (res.data.respCode == "1") {
+                //注册成功  角色默认为教师
+                if (res.data.role == "1") {
+                  localStorage.setItem("roles", "teacher");
+                }
+                var date = new Date();
+                localStorage.setItem("loginTime", date.getTime()); //注册时间
+                localStorage.setItem("isLogin", true);
+                this.$router.push("/home");
+              } else{
+                this.$alert(res.data.respCode, "注册失败", {
+                  confirmButtonText: "确定"
+                });
+              }
+            });
+          }
         } else {
           return false;
         }
@@ -102,7 +220,7 @@ $light_gray: #4a4949;
   position: fixed;
   height: 100%;
   width: 100%;
-//   background-color: $bg;
+  //   background-color: $bg;
   background-image: url("../../assets/bg.jpg");
   background-size: cover;
   background-repeat: no-repeat;
