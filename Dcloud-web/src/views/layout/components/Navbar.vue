@@ -41,7 +41,7 @@ export default {
     },
     logout() {
       this.$router.push({ path: "/login" });
-      localStorage.setItem("login_success", false);
+      localStorage.setItem("isLogin", false);
       location.reload(); // 为了重新实例化vue-router对象 避免bug
     }
   }

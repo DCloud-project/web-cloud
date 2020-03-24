@@ -26,7 +26,12 @@ const router = new Router({
                 import ('@/views/errorPage/404'),
             hidden: true
         },
-
+        {
+            path: '/403',
+            component: () =>
+                import ('@/views/errorPage/403'),
+            hidden: true
+        },
         {
             path: '/',
             component: Layout,
@@ -139,7 +144,8 @@ const router = new Router({
 
             ]
         },
-        { path: '*', redirect: '/404', hidden: true }
+        { path: '*', redirect: '/404', hidden: true },
+        { path: '*', redirect: '/403', hidden: true }
     ]
 
 })

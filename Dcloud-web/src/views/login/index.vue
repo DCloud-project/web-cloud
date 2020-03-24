@@ -52,7 +52,8 @@
           :loading="loading"
           @click="handleLogin"
         >登录</el-button>
-        <el-link type="primary" style="float:right" @click="signup">注册</el-link>
+        <el-link type="primary" style="float:left" @click="signup()">注册</el-link>
+        <el-link type="primary" style="float:right" @click="forgetPass()">忘记密码</el-link>
       </el-form>
       <el-form
         v-show="activeName=='2'"
@@ -250,7 +251,7 @@ export default {
                     this.loading = false;
                     localStorage.setItem("isLogin", true);
                     this.$router.push("/home");
-                  } else{
+                  } else {
                     this.$alert(res.data.respCode, "注册失败", {
                       confirmButtonText: "确定"
                     });
@@ -262,9 +263,9 @@ export default {
       }
     },
     signup() {
-      console.log("ooo");
       this.$router.push("/signup");
-    }
+    },
+    forgetPass() {}
   }
 };
 </script>
