@@ -265,7 +265,9 @@ export default {
     signup() {
       this.$router.push("/signup");
     },
-    forgetPass() {}
+    forgetPass() {
+      this.$router.push("/forgetPassword");
+    }
   }
 };
 </script>
