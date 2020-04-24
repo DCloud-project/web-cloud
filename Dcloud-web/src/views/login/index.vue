@@ -28,7 +28,7 @@
             type="text"
             v-model="loginForm.username"
             autocomplete="on"
-            placeholder="请输入邮箱"
+            placeholder="请输入邮箱或账号"
           ></el-input>
         </el-form-item>
 
