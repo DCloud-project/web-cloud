@@ -143,9 +143,9 @@ export default {
     return {
       list: [
         {
-          chinese: "性别",
-          english: "sex",
-          des: ""
+          name: "性别",
+          code: "sex",
+          description: ""
         }
       ],
       listLoading: false,
@@ -180,7 +180,6 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      // console.log(this.multipleSelection);
     },
     deleteDatas() {
       //批量删除
@@ -190,10 +189,10 @@ export default {
         });
       } else {
         var codes = [];
+        codes.push("-1");
         for (var i in this.multipleSelection) {
-          codes.push({ code: this.multipleSelection[i].code });
+          codes.push(this.multipleSelection[i].code);
         }
-        console.log(codes);
         this.$confirm("确定要删除选择的数据字典？", "删除数据字典", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -201,9 +200,8 @@ export default {
         })
           .then(() => {
             var data = codes;
-            this.$axios
-              .post("/api/dictionary/delDict", data, this.config)
-              .then(res => {
+            this.$http.delete("/api/dictionaries?del_list=" + codes).then(
+              res => {
                 if (res.data.respCode == "1") {
                   this.$alert("数据字典删除成功", "成功", {
                     confirmButtonText: "确定"
@@ -217,7 +215,13 @@ export default {
                   this.showDictionary(this.page);
                 }
                 this.listLoading = false;
-              });
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            );
           })
           .catch(() => {});
       }
@@ -225,7 +229,8 @@ export default {
     deleteData(row) {
       //删除
       var codes = [];
-      codes.push({ code: row.code });
+      codes.push("-1");
+      codes.push(row.code);
       this.$confirm("确定要删除该项数据字典？", "删除数据字典", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -233,9 +238,8 @@ export default {
       })
         .then(() => {
           var data = codes;
-          this.$axios
-            .post("/api/dictionary/delDict", data, this.config)
-            .then(res => {
+          this.$http.delete("/api/dictionaries?del_list=" + codes).then(
+            res => {
               if (res.data.respCode == "1") {
                 this.$alert("数据字典删除成功", "成功", {
                   confirmButtonText: "确定"
@@ -249,7 +253,14 @@ export default {
                 this.showDictionary(this.page);
               }
               this.listLoading = false;
-            });
+            },
+            res => {
+              // error callback
+              this.$router.push({
+                path: "/" + res
+              });
+            }
+          );
         })
         .catch(() => {});
     },
@@ -257,46 +268,60 @@ export default {
       //查询
       this.list = [];
       this.listLoading = true;
-      // if (this.formInline.chineseMark == "" && this.formInline.chineseMark == "") {
-      //   this.showDictionary(this.page);
-      // } else {
       this.page = 1;
       var data = {
         page: this.page,
         name: this.formInline.chineseMark,
         code: this.formInline.englishMark
       };
-      this.$axios
-        .post("/api/dictionary/queryList", data, this.config)
-        .then(res => {
-          this.listLoading = false;
-          this.totalNum = res.data.total;
-          if (this.totalNum != 0) {
-            // delete res.data[0];
-            this.list = res.data.records;
+      this.$http
+        .get(
+          "/api/dictionaries?page=" +
+            this.page +
+            "&name=" +
+            this.formInline.chineseMark +
+            "&code=" +
+            this.formInline.englishMark
+        )
+        .then(
+          res => {
+            // success callback
+            this.listLoading = false;
+            this.totalNum = res.data.total;
+            if (this.totalNum != 0) {
+              this.list = res.data.records;
+            }
+          },
+          res => {
+            this.$router.push({
+              path: "/" + res
+            });
           }
-        });
-      // }
+        );
     },
     showDictionary(page) {
       //获取数据
       this.list = [];
       this.listLoading = true;
       this.page = page;
-      var data = {
-        page: this.page
-      };
-      this.$axios
-        .post("/api/dictionary/getList", data, this.config)
-        .then(res => {
+      this.$http.get("/api/dictionaries?page=" + this.page).then(
+        res => {
+          // success callback
+          console.log(res);
           this.listLoading = false;
-          console.log(res.data);
           this.totalNum = res.data.total;
           if (this.totalNum != 0) {
-            // delete res.data[0];
             this.list = res.data.records;
           }
-        });
+        },
+        res => {
+          // this.$message.error('请求失败!  '+res);
+          this.listLoading = false;
+          this.$router.push({
+            path: "/" + res
+          });
+        }
+      );
     },
 
     handleCurrentChange(val) {
@@ -329,17 +354,19 @@ export default {
       //查看详情
       this.dialogFormVisible = true;
       this.dataItemLoading = true;
-      var data = {
-        code: row.code
-      };
-      this.$axios
-        .post("/api/dictionaryDetail/getDetail", data, this.config)
-        .then(res => {
+      this.$http.get("/api/dictionaries?code=" + row.code).then(
+        res => {
           this.dataItemLoading = false;
           console.log(res.data.detail);
           this.itemForm = res.data.dict[0];
           this.dataItem = res.data.detail;
-        });
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
+          });
+        }
+      );
     }
   }
 };
