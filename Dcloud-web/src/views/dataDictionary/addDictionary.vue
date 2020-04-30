@@ -86,7 +86,11 @@
           class="demo-ruleForm"
         >
           <el-form-item label="值" prop="value">
-            <el-input v-model.number="itemForm.value" placeholder="请输入值" :disabled="title=='修改数据项'&&isEdit==true"></el-input>
+            <el-input
+              v-model.number="itemForm.value"
+              placeholder="请输入值"
+              :disabled="title=='修改数据项'&&isEdit==true"
+            ></el-input>
           </el-form-item>
           <el-form-item label="文本" prop="name">
             <el-input v-model="itemForm.name" placeholder="请输入文本"></el-input>
@@ -154,17 +158,19 @@ export default {
   methods: {
     getDetails(code) {
       this.listLoading = true;
-      var data = {
-        code: code
-      };
-      this.$axios
-        .post("/api/dictionaryDetail/getDetail", data, this.config)
-        .then(res => {
+      this.$http.get("/api/dictionaries?code=" + code).then(
+        res => {
           this.listLoading = false;
           this.dictionaryForm = res.data.dict[0];
           this.dic = res.data.dict[0];
           this.list = res.data.detail;
-        });
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
+          });
+        }
+      );
     },
     filterState(state) {
       if (state == "1") {
@@ -181,12 +187,10 @@ export default {
           break;
         }
       }
-      var data = {
-        id: row.id
-      };
-      this.$axios
-        .post("/api/dictionaryDetail/del", data, this.config)
-        .then(res => {
+      var data = [];
+      data.push(row.id);
+      this.$http.delete("/api/dictionaries?del_list=" + data).then(
+        res => {
           if (res.data.respCode == "1") {
             this.$alert("数据项删除成功", "成功", {
               confirmButtonText: "确定"
@@ -196,7 +200,13 @@ export default {
               confirmButtonText: "确定"
             });
           }
-        });
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
+          });
+        }
+      );
     },
     editItem(row) {
       //修改数据项
@@ -228,7 +238,6 @@ export default {
           } else {
             for (var i in this.list) {
               if (this.list[i].value == this.itemForm.value) {
-                console.log("sss");
                 this.list[i].name = this.itemForm.name;
                 this.list[i].isDefault = this.itemForm.isDefault;
                 break;
@@ -237,7 +246,6 @@ export default {
           }
           this.dialogFormVisible = false;
         }
-        console.log(this.list);
       });
     },
     resetForm(formName) {
@@ -266,9 +274,8 @@ export default {
               description: this.dictionaryForm.description,
               detail: details
             };
-            this.$axios
-              .post("/api/dictionaryDetail/addDict", data, this.config)
-              .then(res => {
+            this.$http.post("/api/dictionaries", data).then(
+              res => {
                 if (res.data.respCode == "1") {
                   this.$alert("数据字典添加成功", "成功", {
                     confirmButtonText: "确定"
@@ -278,7 +285,13 @@ export default {
                     confirmButtonText: "确定"
                   });
                 }
-              });
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            );
           } else {
             //修改数据字典
             var details = [];
@@ -301,9 +314,9 @@ export default {
               description: this.dictionaryForm.description,
               detail: details
             };
-            this.$axios
-              .post("/api/dictionary/edit", data, this.config)
-              .then(res => {
+            this.$http.patch("/api/dictionaries", data).then(
+              res => {
+                // success callback
                 if (res.data.respCode == "1") {
                   this.$alert("数据字典修改成功", "成功", {
                     confirmButtonText: "确定"
@@ -313,7 +326,13 @@ export default {
                     confirmButtonText: "确定"
                   });
                 }
-              });
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            );
           }
         }
       });

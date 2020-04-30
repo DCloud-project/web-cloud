@@ -174,7 +174,7 @@ const router = new Router({
                     name: 'dataDictionary',
                     component: () =>
                         import ('@/views/dataDictionary/dictionaryList'),
-                    meta: { title: '数据字典列表', icon: 'tree' }
+                    meta: { title: '数据字典', icon: 'tree' }
                 },
 
             ]
@@ -187,16 +187,33 @@ const router = new Router({
             isShow: false,
             bread: true,
             meta: {
-                title: '数据字典列表'
+                title: '数据字典'
             },
             children: [{
                 path: 'dataDictionary/addDictionary',
                 component: () =>
                     import ('@/views/dataDictionary/addDictionary'),
                 name: 'addDictionary',
-                meta: { title: '数据字典', icon: 'dashboard', noCache: false },
+                meta: { title: '数据字典管理', icon: 'dashboard', noCache: false },
 
             }]
+        },
+        {
+            path: '/',
+            component: Layout,
+            redirect: '/systemManage',
+            name: 'systemManage',
+            roles: "superAdmin",
+            bread: true,
+            children: [{
+                    path: 'systemManage',
+                    name: 'systemManage',
+                    component: () =>
+                        import ('@/views/systemManage/index'),
+                    meta: { title: '系统管理', icon: 'product' }
+                },
+
+            ]
         },
         { path: '*', redirect: '/404', hidden: true },
         { path: '*', redirect: '/403', hidden: true },
