@@ -146,10 +146,20 @@ export default {
           var data = {
             email: this.loginForm1.username
           };
-          this.$axios.post("/api/sendCode", data, this.config).then(res => {
-            // this.validateCode = res.data;
-            localStorage.setItem("validateCode", res.data);
-          });
+          this.$http.post("/api/sendCode", data).then(
+            res => {
+              localStorage.setItem("validateCode", res.data);
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
+              });
+            }
+          );
+          // this.$axios.post("/api/sendCode", data, this.config).then(res => {
+          //   // this.validateCode = res.data;
+          //   localStorage.setItem("validateCode", res.data);
+          // });
 
           //倒计时
           let timer = setInterval(() => {
@@ -184,15 +194,8 @@ export default {
               email: this.loginForm.username,
               password: this.loginForm.password
             };
-            // let config = {
-            //   headers: {
-            //     "Content-Type": "application/json"
-            //   }
-            // };
-            this.$axios
-              .post("/api/loginByPassword", data, this.config)
-              .then(res => {
-                console.log(res.data);
+            this.$http.post("/api/loginByPassword", data).then(
+              res => {
                 if (res.data.respCode == "1") {
                   //登录成功
                   if (res.data.role == "0") {
@@ -213,7 +216,38 @@ export default {
                     confirmButtonText: "确定"
                   });
                 }
-              });
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            );
+            // this.$axios
+            //   .post("/api/loginByPassword", data, this.config)
+            //   .then(res => {
+            //     console.log(res.data);
+            //     if (res.data.respCode == "1") {
+            //       //登录成功
+            //       if (res.data.role == "0") {
+            //         //登录角色
+            //         localStorage.setItem("roles", "teacher");
+            //       } else if (res.data.role == "1") {
+            //         localStorage.setItem("roles", "admin");
+            //       } else if (res.data.role == "2") {
+            //         localStorage.setItem("roles", "superAdmin");
+            //       }
+            //       var date = new Date();
+            //       localStorage.setItem("loginTime", date.getTime()); //登录时间
+            //       this.loading = false;
+            //       localStorage.setItem("isLogin", true);
+            //       this.$router.push("/home");
+            //     } else {
+            //       this.$alert(res.data.respCode, "登录失败", {
+            //         confirmButtonText: "确定"
+            //       });
+            //     }
+            //   });
           }
         });
       } else {
@@ -231,9 +265,8 @@ export default {
               var data = {
                 email: this.loginForm1.username
               };
-              this.$axios
-                .post("/api/loginByCode", data, this.config)
-                .then(res => {
+              this.$http.post("/api/loginByCode", data).then(
+                res => {
                   this.loading = false;
                   console.log(res.data);
                   if (res.data.respCode == "1") {
@@ -256,7 +289,39 @@ export default {
                       confirmButtonText: "确定"
                     });
                   }
-                });
+                },
+                res => {
+                  this.$router.push({
+                    path: "/" + res
+                  });
+                }
+              );
+              // this.$axios
+              //   .post("/api/loginByCode", data, this.config)
+              //   .then(res => {
+              //     this.loading = false;
+              //     console.log(res.data);
+              //     if (res.data.respCode == "1") {
+              //       //登录成功
+              //       if (res.data.role == "0") {
+              //         //登录角色
+              //         localStorage.setItem("roles", "teacher");
+              //       } else if (res.data.role == "1") {
+              //         localStorage.setItem("roles", "admin");
+              //       } else if (res.data.role == "2") {
+              //         localStorage.setItem("roles", "superAdmin");
+              //       }
+              //       var date = new Date();
+              //       localStorage.setItem("loginTime", date.getTime()); //登录时间
+              //       this.loading = false;
+              //       localStorage.setItem("isLogin", true);
+              //       this.$router.push("/home");
+              //     } else {
+              //       this.$alert(res.data.respCode, "注册失败", {
+              //         confirmButtonText: "确定"
+              //       });
+              //     }
+              //   });
             }
           }
         });

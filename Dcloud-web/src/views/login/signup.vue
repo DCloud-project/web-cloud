@@ -147,9 +147,16 @@ export default {
           var data = {
             email: this.loginForm.username
           };
-          this.$axios.post("/api/sendCode", data, this.config).then(res => {
-            localStorage.setItem("validateCode", res.data);
-          });
+           this.$http.post("/api/sendCode", data).then(
+            res => {
+              localStorage.setItem("validateCode", res.data);
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
+              });
+            }
+          );
 
           //倒计时
           let timer = setInterval(() => {
@@ -181,8 +188,9 @@ export default {
               email: this.loginForm1.username,
               password: this.loginForm.pass
             };
-            this.$axios.post("/api/register", data, this.config).then(res => {
-              this.loading = false;
+             this.$http.post("/api/sendCode", data).then(
+            res => {
+               this.loading = false;
               if (res.data.respCode == "1") {
                 //注册成功  角色默认为教师
                 if (res.data.role == "1") {
@@ -197,7 +205,13 @@ export default {
                   confirmButtonText: "确定"
                 });
               }
-            });
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
+              });
+            }
+          );
           }
         } else {
           return false;

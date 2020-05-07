@@ -86,7 +86,7 @@
           <template slot-scope="scope">
             <span>{{scope.row.schoolName}}</span>
           </template>
-        </el-table-column> -->
+        </el-table-column>-->
         <el-table-column align="center" label="操作" min-width="150">
           <template slot-scope="scope">
             <div>
@@ -228,25 +228,32 @@ export default {
       var data = {
         email: row.email
       };
-      this.$axios.post("/api/changeUserState", data, this.config).then(res => {
-        if (res.data.respCode == "1") {
-          this.$alert("状态修改成功", "成功", {
-            confirmButtonText: "确定"
+      this.$http.patch("/api/user", data).then(
+        res => {
+          // success callback
+          if (res.data.respCode == "1") {
+            this.$alert("状态修改成功", "成功", {
+              confirmButtonText: "确定"
+            });
+            this.showUserInfo(this.page);
+          } else {
+            this.$alert(res.data.respCode, "失败", {
+              confirmButtonText: "确定"
+            });
+            this.showUserInfo(this.page);
+          }
+          this.listLoading = false;
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
           });
-          this.showUserInfo(this.page);
-        } else {
-          this.$alert(res.data.respCode, "失败", {
-            confirmButtonText: "确定"
-          });
-          this.showUserInfo(this.page);
         }
-        this.listLoading = false;
-      });
+      );
     },
 
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      // console.log(this.multipleSelection);
     },
     deleteData() {
       //批量删除
@@ -257,7 +264,7 @@ export default {
       } else {
         var emails = [];
         for (var i in this.multipleSelection) {
-          emails.push({ email: this.multipleSelection[i].email });
+          emails.push(this.multipleSelection[i].email);
         }
         console.log(emails);
         this.$confirm("确定要删除选择的用户？", "删除用户", {
@@ -267,21 +274,28 @@ export default {
         })
           .then(() => {
             var data = emails;
-            this.$axios.post("/api/deleteUser", data, this.config).then(res => {
-              if (res.data.respCode == "1") {
-                this.$alert("用户删除成功", "成功", {
-                  confirmButtonText: "确定"
+            this.$http.delete("/api/user?del_list=" + data).then(
+              res => {
+                if (res.data.respCode == "1") {
+                  this.$alert("用户删除成功", "成功", {
+                    confirmButtonText: "确定"
+                  });
+                  this.page = 1;
+                  this.showUserInfo(this.page);
+                } else {
+                  this.$alert(res.data.respCode, "失败", {
+                    confirmButtonText: "确定"
+                  });
+                  this.showUserInfo(this.page);
+                }
+                this.listLoading = false;
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
                 });
-                this.page = 1;
-                this.showUserInfo(this.page);
-              } else {
-                this.$alert(res.data.respCode, "失败", {
-                  confirmButtonText: "确定"
-                });
-                this.showUserInfo(this.page);
               }
-              this.listLoading = false;
-            });
+            );
           })
           .catch(() => {});
       }
@@ -293,19 +307,30 @@ export default {
         this.showUserInfo(this.page);
       } else {
         this.page = 1;
-        var data = {
-          page: this.page,
-          name: this.formInline.username,
-          state: this.formInline.state
-        };
-        this.$axios.post("/api/searchUser", data, this.config).then(res => {
-          this.listLoading = false;
-          this.totalNum = res.data[0].totalCount;
-          if (this.totalNum != 0) {
-            delete res.data[0];
-            this.list = res.data;
-          }
-        });
+        this.$http
+          .get(
+            "/api/user?page=" +
+              this.page +
+              "&state=" +
+              this.formInline.state +
+              "&name=" +
+              this.formInline.username
+          )
+          .then(
+            res => {
+              this.listLoading = false;
+              this.totalNum = res.data[0].totalCount;
+              if (this.totalNum != 0) {
+                delete res.data[0];
+                this.list = res.data;
+              }
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
+              });
+            }
+          );
       }
     },
     showUserInfo(page) {
@@ -316,14 +341,21 @@ export default {
       var data = {
         page: this.page
       };
-      this.$axios.post("/api/userList", data, this.config).then(res => {
-        this.listLoading = false;
-        this.totalNum = res.data[0].totalCount;
-        if (this.totalNum != 0) {
-          delete res.data[0];
-          this.list = res.data;
+      this.$http.get("/api/user?page=" + this.page + "&state=&name=").then(
+        res => {
+          this.listLoading = false;
+          this.totalNum = res.data[0].totalCount;
+          if (this.totalNum != 0) {
+            delete res.data[0];
+            this.list = res.data;
+          }
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
+          });
         }
-      });
+      );
     },
     reset() {
       this.ruleForm.name = "";
@@ -347,20 +379,27 @@ export default {
               roleId: this.ruleForm.roleId,
               email: this.ruleForm.email
             };
-            this.$axios.post("/api/addUser", data, this.config).then(res => {
-              if (res.data.respCode == "1") {
-                this.$alert("用户添加成功", "成功", {
-                  confirmButtonText: "确定"
+            this.$http.post("/api/user", data).then(
+              res => {
+                if (res.data.respCode == "1") {
+                  this.$alert("用户添加成功", "成功", {
+                    confirmButtonText: "确定"
+                  });
+                  this.showUserInfo(this.page);
+                } else {
+                  this.$alert(res.data.respCode, "失败", {
+                    confirmButtonText: "确定"
+                  });
+                  this.showUserInfo(this.page);
+                }
+                this.listLoading = false;
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
                 });
-                this.showUserInfo(this.page);
-              } else {
-                this.$alert(res.data.respCode, "失败", {
-                  confirmButtonText: "确定"
-                });
-                this.showUserInfo(this.page);
               }
-              this.listLoading = false;
-            });
+            );
           } else {
             //修改信息
             var data = {
@@ -369,9 +408,8 @@ export default {
               roleId: this.ruleForm.roleId,
               email: this.ruleForm.email
             };
-            this.$axios
-              .post("/api/updateUserByAdmin", data, this.config)
-              .then(res => {
+            this.$http.put("/api/user", data).then(
+              res => {
                 if (res.data.respCode == "1") {
                   this.$alert("用户修改成功", "成功", {
                     confirmButtonText: "确定"
@@ -384,7 +422,13 @@ export default {
                   this.showUserInfo(this.page);
                 }
                 this.listLoading = false;
-              });
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            );
           }
         }
       });
