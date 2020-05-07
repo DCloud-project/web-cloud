@@ -40,36 +40,63 @@
         :header-cell-style="{background:'#eef1f6',color:'#606266'}"
       >
         <el-table-column type="selection" width="50"></el-table-column>
-        <el-table-column label="序号" type="index" width="50" align="center"></el-table-column>
-        <el-table-column label="菜单名称" min-width="110" align="center">
-          <template slot-scope="scope">
-            <span>{{scope.row.username}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="用户名" min-width="110" align="center">
+        <el-table-column label="菜单名称" min-width="60" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.name}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="性别" min-width="50" align="center">
+
+        <el-table-column label="图标" min-width="50" align="center">
           <template slot-scope="scope">
-            <span v-if="scope.row.sex=='0'">男</span>
-            <span v-if="scope.row.sex=='1'">女</span>
+            <span>{{scope.row.icon}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="电话号码" min-width="100" align="center">
+
+        <el-table-column label="层级" min-width="50" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.tel}}</span>
+            <span>{{scope.row.menuOrder}}级</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="父菜单" min-width="60" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.parentId}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="排序" min-width="50" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.menuOrder}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="是否可见" min-width="70" align="center">
+          <template slot-scope="scope">
+            <i class="el-icon-check" v-if="scope.row.isVisible=='1'" style="color:green"></i>
+            <i class="el-icon-close" v-if="scope.row.isVisible=='0'" style="color:red"></i>
+          </template>
+        </el-table-column>
+        <el-table-column label="是否是菜单" min-width="80" align="center">
+          <template slot-scope="scope">
+            <i class="el-icon-check" v-if="scope.row.isMenu=='1'" style="color:green"></i>
+            <i class="el-icon-close" v-if="scope.row.isMenu=='0'" style="color:red"></i>
+          </template>
+        </el-table-column>
+        <el-table-column label="是否是页面" min-width="80" align="center">
+          <template slot-scope="scope">
+            <i class="el-icon-check" v-if="scope.row.isPage=='1'" style="color:green"></i>
+            <i class="el-icon-close" v-if="scope.row.isPage=='0'" style="color:red"></i>
+          </template>
+        </el-table-column>
+        <el-table-column label="请求地址" min-width="80" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.url}}</span>
           </template>
         </el-table-column>
         <el-table-column align="center" label="操作" min-width="100">
           <template slot-scope="scope">
-            <i
-              class="el-icon-key"
-              @click="resetPass(scope.row)"
-              style="font-size:17px;margin-right:10px;"
-            ></i>
-            <i class="el-icon-delete" @click="deleteUser(scope.row)" style="font-size:17px"></i>
+            <div>
+              <el-link type="primary" @click="editData(scope.row)">编辑</el-link>
+              <el-divider direction="vertical"></el-divider>
+              <el-link type="danger" @click="deleteUser(scope.row)">删除</el-link>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -85,29 +112,45 @@
     </div>
     <el-dialog :title="title" :visible.sync="dialogFormVisible">
       <el-form
-        :model="ruleForm"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="100px"
-        class="demo-ruleForm"
+        :model="menuForm"
+        :rules="menus"
+        ref="menuForm"
+        label-width="150px"
+        class="demo-menuForm"
       >
-        <el-form-item label="用户账号" prop="username">
-          <el-input v-model="ruleForm.username" :disabled="title=='修改用户信息'"></el-input>
+        <el-form-item label="上级菜单" prop="parentId">
+          <el-select v-model="menuForm.parentId" placeholder="请选择上级菜单">
+            <el-option v-for="item in parentList" :key="item" :value="item"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="用户名称">
-          <el-input v-model="ruleForm.name"></el-input>
+        <el-form-item label="菜单名称" prop="name">
+          <el-input v-model="menuForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="性别">
-          <el-radio v-model="ruleForm.sex" label="0">男</el-radio>
-          <el-radio v-model="ruleForm.sex" label="1">女</el-radio>
+        <el-form-item label="图标">
+          <el-input v-model="menuForm.icon"></el-input>
         </el-form-item>
-        <el-form-item label="联系方式" prop="tel">
-          <el-input v-model="ruleForm.tel"></el-input>
+        <el-form-item label="是否是页面" prop="isPage">
+          <el-radio v-model="menuForm.isPage" label="1">是</el-radio>
+          <el-radio v-model="menuForm.isPage" label="0">否</el-radio>
+        </el-form-item>
+        <el-form-item label="请求地址">
+          <el-input v-model="menuForm.url"></el-input>
+        </el-form-item>
+        <el-form-item label="是否是菜单" prop="isMenu">
+          <el-radio v-model="menuForm.isMenu" label="1">是</el-radio>
+          <el-radio v-model="menuForm.isMenu" label="0">否</el-radio>
+        </el-form-item>
+        <el-form-item label="菜单状态(默认可见)">
+          <el-radio v-model="menuForm.isVisible" label="1">可见</el-radio>
+          <el-radio v-model="menuForm.isVisible" label="0">不可见</el-radio>
+        </el-form-item>
+        <el-form-item label="显示排序" prop="menuOrder">
+          <el-input v-model="menuForm.menuOrder"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
-        <el-button @click="resetForm('ruleForm')">取消</el-button>
+        <el-button type="primary" @click="submitForm('menuForm')">提交</el-button>
+        <el-button @click="resetForm('menuForm')">取消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -116,45 +159,39 @@
 <script>
 export default {
   data() {
-    var checkPhone = (rule, value, callback) => {
-      if (!value) {
-        return callback();
-      } else {
-        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
-        console.log(reg.test(value));
-        if (reg.test(value)) {
-          callback();
-        } else {
-          return callback(new Error("请输入正确的手机号"));
-        }
-      }
-    };
     return {
       list: [],
       AllData: [],
       listLoading: false,
       multipleSelection: [],
       dialogFormVisible: false,
-      ruleForm: {
+      parentList: [],
+      menuForm: {
+        parentId: "",
         name: "",
-        username: "",
-        tel: "",
-        sex: "0"
+        icon: "",
+        isPage: "",
+        url: "",
+        isVisible: "1",
+        menuOrder: ""
       },
-      rules: {
-        // name: [{ required: true, message: "请输入用户名称", trigger: "blur" }],
-        username: [
-          { required: true, message: "请输入用户账号", trigger: "blur" }
+      menus: {
+        parentId: [
+          { required: true, message: "请选择上级菜单", trigger: "change" }
         ],
-        tel: [{ required: false, validator: checkPhone, trigger: "blur" }]
+        name: [{ required: true, message: "请输入", trigger: "blur" }],
+        isPage: [{ required: true, message: "请选择", trigger: "blur" }],
+        isMenu: [{ required: true, message: "请选择", trigger: "blur" }],
+        menuOrder: [{ required: true, message: "请输入", trigger: "blur" }]
       },
       totalNum: 0,
       title: "新增用户",
       pageSize: 10,
+      page: 1,
       searchUserInput: "",
       formInline: {
-        user: "",
-        region: ""
+        menus: "",
+        state: ""
       }
     };
   },
@@ -169,227 +206,215 @@ export default {
     }
   },
   created() {
-    // this.showUserInfo();
+    this.showUserInfo(this.page);
   },
   methods: {
     reset() {
-      this.ruleForm.sex = "0";
-      this.ruleForm.tel = "";
-      this.ruleForm.username = "";
-      this.ruleForm.name = "";
+      this.menuForm.parentId = "";
+      this.menuForm.name = "";
+      this.menuForm.icon = "";
+      this.menuForm.isPage = "";
+      this.menuForm.url = "";
+      this.menuForm.isVisible = "1";
+      this.menuForm.menuOrder = "";
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
       console.log(this.multipleSelection);
     },
-    searchUser() {
+    addData() {
+      this.reset();
+      this.dialogFormVisible = true;
+      this.title = "新增菜单";
+    },
+    searchData() {
       this.list = [];
       this.listLoading = true;
-      this.$axios
-        .post("/baseUrl/api/mymanage/select?username=" + this.searchUserInput)
+      this.page = 1;
+      var data = {
+        page: this.page,
+        name: this.formInline.menus,
+        state: this.formInline.state
+      };
+      this.$http
+        .get(
+          "/api/menus?page=" +
+            this.page +
+            "&name=" +
+            this.formInline.menus +
+            "&is_visible=" +
+            this.formInline.state
+        )
         .then(res => {
           this.listLoading = false;
-          var mapsize = Object.keys(res.data).length;
-          this.AllData = res.data; //用户信息
-          this.totalNum = mapsize;
-          if (mapsize <= this.pageSize) {
-            for (var i in res.data) {
-              this.list.push(this.AllData[i]);
-            }
-          } else {
-            var j = 0;
-            for (var i in res.data) {
-              this.list.push(this.AllData[i]);
-              j++;
-              if (j >= this.pageSize) {
-                break;
-              }
+          this.totalNum = res.data.total;
+          if (this.totalNum != 0) {
+            this.list = res.data.records;
+            for (var i = 0; i < this.list.length; i++) {
+              this.list[i].parentId = this.parentFind(this.list[i].parentId);
             }
           }
         });
     },
-    resetPass(row) {
-      this.$confirm("确定要为该用户重置密码吗？", "重置密码", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "info"
-      })
-        .then(() => {
-          this.$axios
-            .post("/baseUrl/api/mymanage/reset?ids=" + row.id)
-            .then(res => {
-              if (res.data.response == "1000") {
-                this.$alert("重置密码成功", "成功", {
-                  confirmButtonText: "确定"
-                });
-              }
-            });
-        })
-        .catch(() => {});
-    },
-    resetpassAll() {
-      //批量重置
-      if (this.multipleSelection.length == 0) {
-        this.$alert("请至少选中一条数据", "批量重置", {
-          confirmButtonText: "确定"
-        });
-      } else {
-        var ids = new Array();
-        for (var i in this.multipleSelection) {
-          ids.push(this.multipleSelection[i].id);
-        }
-        this.$confirm("确定要为这些用户重置密码吗？", "重置密码", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "info"
-        })
-          .then(() => {
-            this.$axios
-              .post("/baseUrl/api/mymanage/reset?ids=" + ids)
-              .then(res => {
-                this.$alert("重置密码成功", "成功", {
-                  confirmButtonText: "确定"
-                });
-              });
-          })
-          .catch(() => {});
-      }
-    },
-    // editUser(row) {
-    //   //编辑用户信息
-    //   this.dialogFormVisible = true;
-    //   // this.ruleForm = row;
-    //   this.ruleForm.username = row.username;
-    //   this.ruleForm.name = row.name;
-    //   this.ruleForm.sex = row.sex;
-    //   this.ruleForm.tel = row.tel;
-    //   this.title = "修改用户信息";
-    // },
+
     deleteUser(row) {
       //单个删除
+      var del_list = [];
+      del_list.push(row.id);
       this.$confirm("确定要删除该用户？", "删除用户", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "info"
       })
         .then(() => {
-          this.$axios
-            .post("/baseUrl/api/mymanage/delete?ids=" + row.id)
-            .then(res => {
-              if (res.data.response == "1000") {
-                this.$alert("删除成功", "成功", {
-                  confirmButtonText: "确定"
-                });
-              }
-              this.showUserInfo();
-            });
+          this.$http.delete("/api/menus?ids=" + del_list).then(res => {
+            if (res.data.respCode == "1") {
+              this.$alert("删除成功", "成功", {
+                confirmButtonText: "确定"
+              });
+            }
+            this.showUserInfo(this.page);
+          });
         })
         .catch(() => {});
     },
-    deleteAll() {
+    deleteData() {
       //批量删除
       if (this.multipleSelection.length == 0) {
         this.$alert("请至少选中一条数据", "批量删除", {
           confirmButtonText: "确定"
         });
       } else {
-        var ids = new Array();
+        var del_list = [];
         for (var i in this.multipleSelection) {
-          ids.push(this.multipleSelection[i].id);
+          del_list.push(this.multipleSelection[i].id);
         }
-        this.$confirm("确定要删除选择的用户？", "删除用户", {
+        this.$confirm("确定要删除所选择的菜单？", "删除菜单", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "info"
         })
           .then(() => {
-            this.$axios
-              .post("/baseUrl/api/mymanage/delete?ids=" + ids)
-              .then(res => {
-                if (res.data.response == "1000") {
-                  this.$alert("删除成功", "成功", {
-                    confirmButtonText: "确定"
-                  });
-                }
-                this.showUserInfo();
-              });
+            this.$http.delete("/api/menus?ids=" + del_list).then(res => {
+              if (res.data.respCode == "1") {
+                this.$alert("删除成功", "成功", {
+                  confirmButtonText: "确定"
+                });
+              }
+              this.showUserInfo(this.page);
+            });
           })
           .catch(() => {});
       }
     },
-    showUserInfo() {
+    parentFind(id) {
+      //寻找父菜单
+      var parentName = "";
+      for (var i = 0; i < this.list.length; i++) {
+        if (id == this.list[i].id) {
+          parentName = this.list[i].name;
+        }
+      }
+      return parentName;
+    },
+    editData(row) {
+      this.menuForm = row;
+      this.menuForm.parentId = this.menuForm.parentId.toString();
+      this.menuForm.isPage = this.menuForm.isPage.toString();
+      this.menuForm.isMenu = this.menuForm.isMenu.toString();
+      this.menuForm.isVisible = this.menuForm.isVisible.toString();
+      this.title = "编辑菜单";
+      this.dialogFormVisible = true;
+    },
+    showUserInfo(page) {
       this.list = [];
       this.listLoading = true;
+      this.page = page;
       //获取用户信息
-      this.$axios.post("/baseUrl/api/mymanage/show").then(res => {
+      var data = {
+        page: this.page
+      };
+      this.$http.get("/api/menus?page=" + page).then(res => {
         this.listLoading = false;
-        var mapsize = Object.keys(res.data).length;
-        this.AllData = res.data; //用户信息
-        this.totalNum = mapsize;
-        if (mapsize <= this.pageSize) {
-          for (var i in res.data) {
-            this.list.push(this.AllData[i]);
-          }
-        } else {
-          var j = 0;
-          for (var i in res.data) {
-            this.list.push(this.AllData[i]);
-            j++;
-            if (j >= this.pageSize) {
-              break;
-            }
+        this.totalNum = res.data.total;
+        if (this.totalNum != 0) {
+          delete res.data[0];
+          this.list = res.data.records;
+          for (var i = 0; i < this.list.length; i++) {
+            this.list[i].parentId = this.parentFind(this.list[i].parentId);
           }
         }
-        // } else {
-        //   self.$alert("用户类别获取失败，请稍后重试", "失败", {
-        //     confirmButtonText: "确定"
-        //   });
-        // }
+      });
+      this.getParentList();
+    },
+
+    getParentList() {
+      this.$http.get("/api/menus").then(res => {
+        this.listLoading = false;
+        this.parentList = res.data;
       });
     },
+
     addUser() {
       this.reset();
       this.dialogFormVisible = true;
-      this.title = "新增用户";
+      this.title = "新增菜单";
     },
     submitForm(formName) {
+      var data = {
+        id: this.menuForm.id,
+        parent_name: this.menuForm.parentId,
+        name: this.menuForm.name,
+        icon: this.menuForm.icon,
+        is_page: this.menuForm.isPage,
+        url: this.menuForm.url,
+        is_visible: this.menuForm.isVisible,
+        is_menu: this.menuForm.isMenu,
+        menu_order: this.menuForm.menuOrder
+      };
+      var addData = {
+        parent_name: this.menuForm.parentId,
+        name: this.menuForm.name,
+        icon: this.menuForm.icon,
+        is_page: this.menuForm.isPage,
+        url: this.menuForm.url,
+        is_visible: this.menuForm.isVisible,
+        is_menu: this.menuForm.isMenu,
+        menu_order: this.menuForm.menuOrder
+      };
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.dialogFormVisible = false;
-          if (this.title == "新增用户") {
-            this.$axios
-              .post(
-                "/baseUrl/api/mymanage/add?username=" +
-                  this.ruleForm.username +
-                  "&password=123456" +
-                  "&name=" +
-                  this.ruleForm.name +
-                  "&sex=" +
-                  this.ruleForm.sex +
-                  "&tel=" +
-                  this.ruleForm.tel
-              )
-              .then(res => {
-                if (res.data.respcode == "1000") {
-                  //添加用户成功
-                  this.$alert("操作成功", "成功", {
-                    confirmButtonText: "确定"
-                  });
-                } else if (res.data.respcode == "1001") {
-                  this.$alert("该用户已存在", "失败", {
-                    confirmButtonText: "确定"
-                  });
-                } else {
-                  this.$alert("操作失败，请稍后重试", "失败", {
-                    confirmButtonText: "确定"
-                  });
-                }
-                this.$refs[formName].resetFields();
-                this.ruleForm.sex = "0";
-                this.showUserInfo();
-              });
+          if (this.title == "新增菜单") {
+            this.$http.post("/api/menus", addData).then(res => {
+              if (res.data.respCode == "1") {
+                this.$alert("菜单新增成功", "成功", {
+                  confirmButtonText: "确定"
+                });
+                this.showUserInfo(this.page);
+              } else {
+                this.$alert("菜单新增失败", "失败", {
+                  confirmButtonText: "确定"
+                });
+                this.showUserInfo(this.page);
+              }
+              this.$refs[formName].resetFields();
+            });
           } else {
-            //修改信息
+            console.log(data);
+            this.$http.patch("/api/menus", data).then(res => {
+              if (res.data.respCode == "1") {
+                this.$alert("菜单修改成功", "成功", {
+                  confirmButtonText: "确定"
+                });
+                this.showUserInfo(this.page);
+              } else {
+                this.$alert("菜单修改失败", "失败", {
+                  confirmButtonText: "确定"
+                });
+                this.showUserInfo(this.page);
+              }
+            });
           }
         }
       });
@@ -400,24 +425,8 @@ export default {
       this.reset();
     },
     handleCurrentChange(val) {
-      // console.log(val);
-      //根据页数显示页面上的数据。
-      this.list = [];
-      var mapsize = Object.keys(this.AllData).length;
-
-      if (mapsize - (val - 1) * this.pageSize < this.pageSize) {
-        for (var i = (val - 1) * this.pageSize + 1; i <= mapsize; i++) {
-          this.list.push(this.AllData[i]);
-        }
-      } else {
-        for (
-          var i = (val - 1) * this.pageSize + 1;
-          i <= val * this.pageSize;
-          i++
-        ) {
-          this.list.push(this.AllData[i]);
-        }
-      }
+      this.page = val;
+      this.showUserInfo(this.page);
     },
     resetData() {
       this.searchUserInput = "";
