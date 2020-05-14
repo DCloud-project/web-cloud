@@ -198,6 +198,7 @@ export default {
               res => {
                 if (res.data.respCode == "1") {
                   //登录成功
+                  localStorage.setItem("roleId", res.data.role);
                   if (res.data.role == "0") {
                     //登录角色
                     localStorage.setItem("roles", "teacher");
@@ -268,9 +269,9 @@ export default {
               this.$http.post("/api/loginByCode", data).then(
                 res => {
                   this.loading = false;
-                  console.log(res.data);
                   if (res.data.respCode == "1") {
                     //登录成功
+                    localStorage.setItem("roleId", res.data.role);
                     if (res.data.role == "0") {
                       //登录角色
                       localStorage.setItem("roles", "teacher");
