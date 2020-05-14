@@ -12,6 +12,8 @@ import store from './store'
 import '@/icons'
 import axios from 'axios'
 import VueResource from 'vue-resource'
+import authority from '@/store/authority'
+Vue.prototype.authority=authority
 Vue.use(VueResource)
 Vue.prototype.$axios = axios
 
