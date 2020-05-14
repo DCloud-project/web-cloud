@@ -90,8 +90,8 @@
         <el-table-column align="center" label="操作" min-width="150">
           <template slot-scope="scope">
             <div>
-              <el-link type="primary" @click="permissionAssign(scope.row)">分配权限</el-link>
-              <el-divider direction="vertical"></el-divider>
+              <!--  <el-link type="primary" @click="permissionAssign(scope.row)">分配权限</el-link>
+              <el-divider direction="vertical"></el-divider>-->
               <el-link type="primary" @click="editData(scope.row)">编辑</el-link>
               <el-divider direction="vertical"></el-divider>
               <el-link type="danger" @click="resetPass(scope.row)">重置密码</el-link>
@@ -135,8 +135,8 @@
               :value="item.value"
             ></el-option>
           </el-select>-->
-          <el-radio v-model="ruleForm.roleId" label="0">老师</el-radio>
-          <el-radio v-model="ruleForm.roleId" label="1">管理员</el-radio>
+          <el-radio v-model="ruleForm.roleId" label="0" :disabled="roleAu==false">老师</el-radio>
+          <el-radio v-model="ruleForm.roleId" label="1" :disabled="roleAu==false">管理员</el-radio>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" style="text-align: center;margin-bottom:10px">
@@ -183,6 +183,7 @@ export default {
         roleId: "0",
         email: ""
       },
+      roleAu: false,
       rules: {
         name: [{ required: true, message: "请输入用户名称", trigger: "blur" }],
         roleId: [{ required: true, message: "请选择角色", trigger: "change" }],
@@ -206,8 +207,12 @@ export default {
       page: 1
     };
   },
+  mounted() {
+    this.getStateAu();
+  },
   created() {
     this.showUserInfo(this.page);
+    this.getStateAu();
   },
   methods: {
     filterState(state) {
@@ -224,71 +229,196 @@ export default {
         return "danger";
       }
     },
+    getStateAu() {
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "4") {
+            this.roleAu = true;
+          }
+        }
+      }
+    },
     changeState(row) {
       var data = {
         email: row.email
       };
-      this.$http.patch("/api/user", data).then(
-        res => {
-          // success callback
-          if (res.data.respCode == "1") {
-            this.$alert("状态修改成功", "成功", {
-              confirmButtonText: "确定"
-            });
-            this.showUserInfo(this.page);
-          } else {
-            this.$alert(res.data.respCode, "失败", {
-              confirmButtonText: "确定"
-            });
-            this.showUserInfo(this.page);
+      var auth = 0;
+      //恢复权限
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "5") {
+            auth = 1;
           }
-          this.listLoading = false;
-        },
-        res => {
-          this.$router.push({
-            path: "/" + res
-          });
         }
-      );
+      }
+      var auth1=0;
+      //禁用权限
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "8") {
+            auth1 = 1;
+          }
+        }
+      }
+      if ((auth&&row.state==1)||(auth1&&row.state==0)) {
+        this.$http.patch("/api/user", data).then(
+          res => {
+            // success callback
+            if (res.data.respCode == "1") {
+              this.$alert("状态修改成功", "成功", {
+                confirmButtonText: "确定"
+              });
+              this.showUserInfo(this.page);
+            } else {
+              this.$alert(res.data.respCode, "失败", {
+                confirmButtonText: "确定"
+              });
+              this.showUserInfo(this.page);
+            }
+            this.listLoading = false;
+          },
+          res => {
+            this.$router.push({
+              path: "/" + res
+            });
+          }
+        );
+      } else {
+        if(row.state==0){
+        this.$alert("你没有禁用用户状态权限", {
+          confirmButtonText: "确定"
+        });
+        }else{
+           this.$alert("你没有恢复用户状态权限", {
+          confirmButtonText: "确定"
+        })
+        }
+      }
     },
-
+    resetPass(row) {
+      //重置密码
+      var auth = 0;
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "6") {
+            auth = 1;
+          }
+        }
+      }
+      if (auth) {
+        this.$http
+          .put("/api/user/resetPassword?email=" + row.email)
+          .then(res => {
+            if (res.data.respCode == "1") {
+              this.$alert("密码重置成功", "成功", {
+                confirmButtonText: "确定"
+              });
+            } else {
+              this.$alert(res.data.respCode, "失败", {
+                confirmButtonText: "确定"
+              });
+            }
+          });
+      } else {
+        this.$alert("你没有重置密码权限", {
+          confirmButtonText: "确定"
+        });
+      }
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
     deleteData() {
       //批量删除
-      if (this.multipleSelection.length == 0) {
-        this.$alert("请至少选中一条数据", "批量删除", {
+      var auth = 0;
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "2") {
+            auth = 1;
+          }
+        }
+      }
+      if (auth) {
+        if (this.multipleSelection.length == 0) {
+          this.$alert("请至少选中一条数据", "批量删除", {
+            confirmButtonText: "确定"
+          });
+        } else {
+          var emails = [];
+          for (var i in this.multipleSelection) {
+            emails.push(this.multipleSelection[i].email);
+          }
+          this.$confirm("确定要删除选择的用户？", "删除用户", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "info"
+          })
+            .then(() => {
+              var data = emails;
+              this.$http.delete("/api/user?del_list=" + data).then(
+                res => {
+                  if (res.data.respCode == "1") {
+                    this.$alert("用户删除成功", "成功", {
+                      confirmButtonText: "确定"
+                    });
+                    this.page = 1;
+                    this.showUserInfo(this.page);
+                  } else {
+                    this.$alert(res.data.respCode, "失败", {
+                      confirmButtonText: "确定"
+                    });
+                    this.showUserInfo(this.page);
+                  }
+                  this.listLoading = false;
+                },
+                res => {
+                  this.$router.push({
+                    path: "/" + res
+                  });
+                }
+              );
+            })
+            .catch(() => {});
+        }
+      } else {
+        this.$alert("你没有删除用户权限", {
           confirmButtonText: "确定"
         });
-      } else {
-        var emails = [];
-        for (var i in this.multipleSelection) {
-          emails.push(this.multipleSelection[i].email);
+      }
+    },
+    searchData() {
+      var auth = 0;
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "7") {
+            auth = 1;
+          }
         }
-        console.log(emails);
-        this.$confirm("确定要删除选择的用户？", "删除用户", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "info"
-        })
-          .then(() => {
-            var data = emails;
-            this.$http.delete("/api/user?del_list=" + data).then(
+      }
+      if (auth) {
+        this.list = [];
+        this.listLoading = true;
+        if (this.formInline.username == "" && this.formInline.state == "") {
+          this.showUserInfo(this.page);
+        } else {
+          this.page = 1;
+          this.$http
+            .get(
+              "/api/user?page=" +
+                this.page +
+                "&state=" +
+                this.formInline.state +
+                "&name=" +
+                this.formInline.username
+            )
+            .then(
               res => {
-                if (res.data.respCode == "1") {
-                  this.$alert("用户删除成功", "成功", {
-                    confirmButtonText: "确定"
-                  });
-                  this.page = 1;
-                  this.showUserInfo(this.page);
-                } else {
-                  this.$alert(res.data.respCode, "失败", {
-                    confirmButtonText: "确定"
-                  });
-                  this.showUserInfo(this.page);
-                }
                 this.listLoading = false;
+                this.totalNum = res.data[0].totalCount;
+                if (this.totalNum != 0) {
+                  delete res.data[0];
+                  this.list = res.data;
+                }
               },
               res => {
                 this.$router.push({
@@ -296,41 +426,11 @@ export default {
                 });
               }
             );
-          })
-          .catch(() => {});
-      }
-    },
-    searchData() {
-      this.list = [];
-      this.listLoading = true;
-      if (this.formInline.username == "" && this.formInline.state == "") {
-        this.showUserInfo(this.page);
+        }
       } else {
-        this.page = 1;
-        this.$http
-          .get(
-            "/api/user?page=" +
-              this.page +
-              "&state=" +
-              this.formInline.state +
-              "&name=" +
-              this.formInline.username
-          )
-          .then(
-            res => {
-              this.listLoading = false;
-              this.totalNum = res.data[0].totalCount;
-              if (this.totalNum != 0) {
-                delete res.data[0];
-                this.list = res.data;
-              }
-            },
-            res => {
-              this.$router.push({
-                path: "/" + res
-              });
-            }
-          );
+        this.$alert("你没有查询用户权限", {
+          confirmButtonText: "确定"
+        });
       }
     },
     showUserInfo(page) {
@@ -364,9 +464,23 @@ export default {
       this.ruleForm.email = "";
     },
     addData() {
-      this.reset();
-      this.dialogFormVisible = true;
-      this.title = "新增用户";
+      var auth = 0;
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "1") {
+            auth = 1;
+          }
+        }
+      }
+      if (auth) {
+        this.reset();
+        this.dialogFormVisible = true;
+        this.title = "新增用户";
+      } else {
+        this.$alert("你没有新增用户权限", {
+          confirmButtonText: "确定"
+        });
+      }
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -451,17 +565,31 @@ export default {
       this.showUserInfo(this.page);
     },
     editData(row) {
-      this.ruleForm = row;
-      this.ruleForm.sex = this.ruleForm.sex.toString();
-      this.ruleForm.roleId = this.ruleForm.roleId.toString();
-      console.log(this.ruleForm);
-      this.title = "修改用户信息";
-      this.dialogFormVisible = true;
+      this.getStateAu();
+      var auth = 0;
+      if (this.authority.authority) {
+        for (var i = 0; i < this.authority.authority.length; i++) {
+          if (this.authority.authority[i] == "3") {
+            auth = 1;
+          }
+        }
+      }
+      if (auth) {
+        this.ruleForm = row;
+        this.ruleForm.sex = this.ruleForm.sex.toString();
+        this.ruleForm.roleId = this.ruleForm.roleId.toString();
+        this.title = "修改用户信息";
+        this.dialogFormVisible = true;
+      } else {
+        this.$alert("你没有编辑用户权限", {
+          confirmButtonText: "确定"
+        });
+      }
     },
     permissionAssign(row) {
       this.$router.push({
         path: "/userManage/permissionAssignment",
-        query: { username: row.username }
+        query: { username: row.name }
       });
     }
   }
