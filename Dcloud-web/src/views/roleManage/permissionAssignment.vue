@@ -105,7 +105,7 @@ export default {
           }
         }
         if (this.menuList.length != 0) {
-           this.saveList += ",";
+          this.saveList += ",";
           this.saveList += this.menuList[0];
           for (var i = 1; i < this.menuList.length; i++) {
             this.saveList += ",";
@@ -115,9 +115,17 @@ export default {
       }
       var power_id = this.saveList;
       this.$http
-        .put("/api/rolePower?role_id=" + this.$route.query.id+"&power_id="+power_id)
+        .put(
+          "/api/rolePower?role_id=" +
+            this.$route.query.id +
+            "&power_id=" +
+            power_id
+        )
         .then(res => {
           if (res.data.respCode == "1") {
+            this.$http.get("/api/rolePower?role_id=" + this.$route.query.id).then(res => {
+              this.authority.authority = res.data;
+            });
             this.$alert("保存成功", "成功", {
               confirmButtonText: "确定"
             });

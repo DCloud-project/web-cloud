@@ -22,7 +22,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="菜单名称：" style="float:right">
-          <el-input placeholder="请输入菜单名称" size="small" v-model="formInline.menu"></el-input>
+          <el-input placeholder="请输入菜单名称" size="small" v-model="formInline.menus"></el-input>
         </el-form-item>
       </el-form>
 
@@ -37,10 +37,21 @@
         tooltip-effect="dark"
         style="width: 100%"
         @selection-change="handleSelectionChange"
+        row-key="id"
+        default-expand-all
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         :header-cell-style="{background:'#eef1f6',color:'#606266'}"
       >
         <el-table-column type="selection" width="50"></el-table-column>
-        <el-table-column label="菜单名称" min-width="60" align="center">
+        <!--
+        <el-table-column
+          v-for="(item,index) in tableList"
+          :key="index"
+          :label="item.label"
+          :prop="item.prop"
+        ></el-table-column>
+        -->
+        <el-table-column label="菜单名称" min-width="70" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.name}}</span>
           </template>
@@ -48,16 +59,15 @@
 
         <el-table-column label="图标" min-width="50" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.icon}}</span>
+            <i :class="scope.row.icon"></i>
           </template>
         </el-table-column>
-
         <el-table-column label="层级" min-width="50" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.menuOrder}}级</span>
           </template>
         </el-table-column>
-        <el-table-column label="父菜单" min-width="60" align="center">
+        <el-table-column label="父菜单" min-width="50" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.parentId}}</span>
           </template>
@@ -73,13 +83,13 @@
             <i class="el-icon-close" v-if="scope.row.isVisible=='0'" style="color:red"></i>
           </template>
         </el-table-column>
-        <el-table-column label="是否是菜单" min-width="80" align="center">
+        <el-table-column label="是否是菜单" min-width="70" align="center">
           <template slot-scope="scope">
             <i class="el-icon-check" v-if="scope.row.isMenu=='1'" style="color:green"></i>
             <i class="el-icon-close" v-if="scope.row.isMenu=='0'" style="color:red"></i>
           </template>
         </el-table-column>
-        <el-table-column label="是否是页面" min-width="80" align="center">
+        <el-table-column label="是否是页面" min-width="70" align="center">
           <template slot-scope="scope">
             <i class="el-icon-check" v-if="scope.row.isPage=='1'" style="color:green"></i>
             <i class="el-icon-close" v-if="scope.row.isPage=='0'" style="color:red"></i>
@@ -90,7 +100,7 @@
             <span>{{scope.row.url}}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="操作" min-width="100">
+        <el-table-column align="center" label="操作" min-width="80">
           <template slot-scope="scope">
             <div>
               <el-link type="primary" @click="editData(scope.row)">编辑</el-link>
@@ -129,6 +139,9 @@
         <el-form-item label="图标">
           <el-input v-model="menuForm.icon"></el-input>
         </el-form-item>
+        <el-form-item>
+          <span>图标名：https://element.eleme.cn/#/zh-CN/component/icon</span>
+        </el-form-item>
         <el-form-item label="是否是页面" prop="isPage">
           <el-radio v-model="menuForm.isPage" label="1">是</el-radio>
           <el-radio v-model="menuForm.isPage" label="0">否</el-radio>
@@ -161,6 +174,44 @@ export default {
   data() {
     return {
       list: [],
+      tableList: [
+        {
+          label: "菜单名称",
+          prop: "name"
+        },
+        {
+          label: "图标",
+          prop: "icon"
+        },
+        {
+          label: "层级",
+          prop: "menuOrder"
+        },
+        {
+          label: "父菜单",
+          prop: "parentId"
+        },
+        {
+          label: "排序",
+          prop: "menuOrder"
+        },
+        {
+          label: "是否可见",
+          prop: "isVisible"
+        },
+        {
+          label: "是否是菜单",
+          prop: "isMenu"
+        },
+        {
+          label: "是否是页面",
+          prop: "isPage"
+        },
+        {
+          label: "请求地址",
+          prop: "url"
+        }
+      ],
       AllData: [],
       listLoading: false,
       multipleSelection: [],
@@ -188,7 +239,7 @@ export default {
       title: "新增用户",
       pageSize: 10,
       page: 1,
-      searchUserInput: "",
+
       formInline: {
         menus: "",
         state: ""
@@ -220,14 +271,35 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(this.multipleSelection);
     },
     addData() {
-      this.reset();
-      this.dialogFormVisible = true;
-      this.title = "新增菜单";
+      var auth = 0;
+      console.log(this.authority.authority)
+      for (var i = 0; i < this.authority.authority.length; i++) {
+        if (this.authority.authority[i] == "9") {
+          auth = 1;
+        }
+      }
+      if (auth) {
+        this.reset();
+        this.dialogFormVisible = true;
+        this.title = "新增菜单";
+      } else {
+        this.$alert("你没有新增菜单权限", {
+          confirmButtonText: "确定"
+        });
+      }
     },
     searchData() {
+      var auth=0;
+      if(this.authority.authority){
+      for(var i=0;i<this.authority.authority.length;i++){
+        if(this.authority.authority[i]=="12"){
+          auth =1
+        }
+      }
+      }
+      if(auth){
       this.list = [];
       this.listLoading = true;
       this.page = 1;
@@ -239,15 +311,16 @@ export default {
       this.$http
         .get(
           "/api/menus?page=" +
-            this.page +
+            data.page +
             "&name=" +
-            this.formInline.menus +
+            data.name +
             "&is_visible=" +
-            this.formInline.state
+            data.state
         )
         .then(res => {
           this.listLoading = false;
           this.totalNum = res.data.total;
+          console.log(res.data.records);
           if (this.totalNum != 0) {
             this.list = res.data.records;
             for (var i = 0; i < this.list.length; i++) {
@@ -255,10 +328,24 @@ export default {
             }
           }
         });
+      }else{
+        this.$alert("你没有查询菜单权限", {
+                    confirmButtonText: "确定"
+                  });
+      }
     },
 
     deleteUser(row) {
       //单个删除
+      var auth=0;
+      if(this.authority.authority){
+      for(var i=0;i<this.authority.authority.length;i++){
+        if(this.authority.authority[i]=="11"){
+          auth =1
+        }
+      }
+      }
+      if(auth){
       var del_list = [];
       del_list.push(row.id);
       this.$confirm("确定要删除该用户？", "删除用户", {
@@ -277,9 +364,23 @@ export default {
           });
         })
         .catch(() => {});
+      }else{
+        this.$alert("你没有删除菜单权限", {
+                    confirmButtonText: "确定"
+                  });
+      }
     },
     deleteData() {
       //批量删除
+      var auth=0;
+      if(this.authority.authority){
+      for(var i=0;i<this.authority.authority.length;i++){
+        if(this.authority.authority[i]=="11"){
+          auth =1
+        }
+      }
+      }
+      if(auth){
       if (this.multipleSelection.length == 0) {
         this.$alert("请至少选中一条数据", "批量删除", {
           confirmButtonText: "确定"
@@ -306,6 +407,11 @@ export default {
           })
           .catch(() => {});
       }
+      }else{
+        this.$alert("你没有删除菜单权限", {
+                    confirmButtonText: "确定"
+                  });
+      }
     },
     parentFind(id) {
       //寻找父菜单
@@ -318,6 +424,15 @@ export default {
       return parentName;
     },
     editData(row) {
+      var auth=0;
+      if(this.authority.authority){
+      for(var i=0;i<this.authority.authority.length;i++){
+        if(this.authority.authority[i]=="10"){
+          auth =1
+        }
+      }
+      }
+      if(auth){
       this.menuForm = row;
       this.menuForm.parentId = this.menuForm.parentId.toString();
       this.menuForm.isPage = this.menuForm.isPage.toString();
@@ -325,6 +440,11 @@ export default {
       this.menuForm.isVisible = this.menuForm.isVisible.toString();
       this.title = "编辑菜单";
       this.dialogFormVisible = true;
+      }else{
+        this.$alert("你没有编辑菜单权限", {
+                    confirmButtonText: "确定"
+                  });
+      }
     },
     showUserInfo(page) {
       this.list = [];
@@ -340,8 +460,41 @@ export default {
         if (this.totalNum != 0) {
           delete res.data[0];
           this.list = res.data.records;
+          var data = res.data.records;
+          function toTree(data) {
+            data.forEach(function(item) {
+              delete item.children;
+            });
+            var map = {};
+            data.forEach(function(item) {
+              map[item.id] = item;
+            });
+            // console.log(map);
+            var val = [];
+            data.forEach(function(item) {
+              var parent = map[item.parentId];
+              if (parent) {
+                (parent.children || (parent.children = [])).push(item);
+              } else {
+                val.push(item);
+              }
+            });
+            return val;
+          }
+          this.list = toTree(data);
+          // for (var i = 0; i < this.list.length; i++) {
+          //   this.list[i].parentId = this.parentFind(this.list[i].parentId);
+          // }
+          // console.log(this.list);
           for (var i = 0; i < this.list.length; i++) {
-            this.list[i].parentId = this.parentFind(this.list[i].parentId);
+            if (this.list[i].parentId == 0) {
+              this.list[i].parentId = "无";
+            }
+            if (this.list[i].children != null) {
+              for (var j = 0; j < this.list[i].children.length; j++) {
+                this.list[i].children[j].parentId = this.list[i].name;
+              }
+            }
           }
         }
       });
@@ -352,6 +505,7 @@ export default {
       this.$http.get("/api/menus").then(res => {
         this.listLoading = false;
         this.parentList = res.data;
+        this.parentList.push("无");
       });
     },
 
@@ -382,11 +536,13 @@ export default {
         is_menu: this.menuForm.isMenu,
         menu_order: this.menuForm.menuOrder
       };
+      console.log(addData)
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.dialogFormVisible = false;
           if (this.title == "新增菜单") {
             this.$http.post("/api/menus", addData).then(res => {
+              console.log(res.data)
               if (res.data.respCode == "1") {
                 this.$alert("菜单新增成功", "成功", {
                   confirmButtonText: "确定"
@@ -401,7 +557,6 @@ export default {
               this.$refs[formName].resetFields();
             });
           } else {
-            console.log(data);
             this.$http.patch("/api/menus", data).then(res => {
               if (res.data.respCode == "1") {
                 this.$alert("菜单修改成功", "成功", {
@@ -429,8 +584,9 @@ export default {
       this.showUserInfo(this.page);
     },
     resetData() {
-      this.searchUserInput = "";
-      this.showUserInfo();
+      (this.formInline.menus = ""),
+        (this.formInline.state = ""),
+        this.showUserInfo(this.page);
     }
   }
 };
