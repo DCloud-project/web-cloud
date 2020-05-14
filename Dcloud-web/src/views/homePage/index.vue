@@ -45,8 +45,22 @@ export default {
       ]
     };
   },
-
-  methods: {}
+ created() {
+  this.showAuthorityList();
+  },
+  methods: {
+    showAuthorityList(){
+      var roleId=localStorage.getItem("roleId");
+      this.$http
+        .get(
+          "/api/rolePower?role_id=" +roleId)
+        .then(res => {
+         this.authority.authority=res.data;
+        });
+      
+    }
+    
+  }
 };
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
