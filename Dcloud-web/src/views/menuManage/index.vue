@@ -549,7 +549,7 @@ export default {
                 });
                 this.showUserInfo(this.page);
               } else {
-                this.$alert("菜单新增失败", "失败", {
+                this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
                 });
                 this.showUserInfo(this.page);

@@ -184,12 +184,12 @@ export default {
         });
     },
     resetData() {
-      this.formInline.role="";
-      this.formInline.state="";
-      this.showRoleInfo(this.page)
+      this.formInline.role = "";
+      this.formInline.state = "";
+      this.showRoleInfo(this.page);
     },
     reset() {
-      this.roleForm.username = "";
+      this.roleForm.name = "";
       this.roleForm.note = "";
     },
     btnState(state) {
@@ -207,17 +207,28 @@ export default {
       }
     },
     changeState(row) {
-      this.$http.patch("/api/role?id=" + row.id+"&state="+row.state).then(res => {
-      if (row.type == "1") {
-        row.state = "0";
-        row.stateName = "禁用";
-        row.type = "0";
-      } else {
-        row.state = "1";
-        row.stateName = "启用";
-        row.type = "1";
-      }
-      });
+      this.$http
+        .patch("/api/role?id=" + row.id + "&state=" + row.state)
+        .then(res => {
+          if (res.data.respCode == "1") {
+            this.$alert("状态修改成功", "成功", {
+              confirmButtonText: "确定"
+            });
+            if (row.state == "1") {
+              row.state = "0";
+              row.stateName = "禁用";
+              row.type = "0";
+            } else {
+              row.state = "1";
+              row.stateName = "启用";
+              row.type = "1";
+            }
+          } else {
+            this.$alert(res.data.respCode, "失败", {
+              confirmButtonText: "确定"
+            });
+          }
+        });
     },
     editData(row) {
       this.roleForm = row;
@@ -246,12 +257,12 @@ export default {
     },
 
     submitForm(formName) {
-      var data={
-        id:this.roleForm.id,
+      var data = {
+        id: this.roleForm.id,
         description: this.roleForm.description,
         name: this.roleForm.name,
-        state:this.roleForm.state
-      }
+        state: this.roleForm.state
+      };
       var addData = {
         description: this.roleForm.description,
         name: this.roleForm.name
@@ -275,7 +286,7 @@ export default {
               this.$refs[formName].resetFields();
             });
           } else {
-             this.$http.put("/api/role", data).then(res => {
+            this.$http.put("/api/role", data).then(res => {
               if (res.data.respCode == "1") {
                 this.$alert("角色修改成功", "成功", {
                   confirmButtonText: "确定"
@@ -349,20 +360,14 @@ export default {
       }
     },
     permissionAssign(row) {
-      var description=[];
-      this.$http
-        .get(
-          "/api/rolePower?role_id=" +row.id)
-        .then(res => {
-          description=res.data;
-          this.$router.push({
-        path: "/roleManage/permissionAssignment",
-        query: { username: row.name,
-        id:row.id,
-        description
-        }
-      });
+      var description = [];
+      this.$http.get("/api/rolePower?role_id=" + row.id).then(res => {
+        description = res.data;
+        this.$router.push({
+          path: "/roleManage/permissionAssignment",
+          query: { username: row.name, id: row.id, description }
         });
+      });
     }
   }
 };
