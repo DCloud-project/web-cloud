@@ -14,8 +14,8 @@
         </el-form-item>
         <el-form-item label="状态：" style="float:right">
           <el-select v-model="formInline.state" placeholder="请选择状态" size="small">
-            <el-option label="禁用" value="1"></el-option>
-            <el-option label="启用" value="2"></el-option>
+            <el-option label="禁用" value="0"></el-option>
+            <el-option label="启用" value="1"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="角色名称：" style="float:right">
