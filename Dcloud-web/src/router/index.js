@@ -215,6 +215,23 @@ const router = new Router({
 
             ]
         },
+        {
+            path: '/',
+            component: Layout,
+            redirect: '/schoolManage',
+            name: 'schoolManage',
+            roles: "superAdmin",
+            bread: true,
+            children: [{
+                    path: 'schoolManage',
+                    name: 'schoolManage',
+                    component: () =>
+                        import ('@/views/schoolManage/index'),
+                    meta: { title: '学校管理', icon: 'table' }
+                },
+
+            ]
+        },
         { path: '*', redirect: '/404', hidden: true },
         { path: '*', redirect: '/403', hidden: true },
     ]

@@ -49,29 +49,44 @@
               v-for="(attendance, index) in experienceForm.attendances"
               :label="'出勤率' + (index+1)"
               :key="attendance.key"
-              :prop="'attendances.' + index + '.value'"
+              :prop="'attendances.' + index+'.ratio2'"
               :rules="{
-      required: true, message: '出勤率不能为空', trigger: 'blur'
-    }"
+                 required: true, message: '出勤率不能为空', trigger: 'blur'}"
             >
               <el-row :gutter="20">
                 <el-col :span="18">
-                  <el-input v-model="attendance.value"></el-input>
+                  <el-row :gutter="20">
+                    <el-col :span="11">
+                      <el-input v-model="attendance.ratio1" disabled>
+                        <template slot="append" style="padding:0 10px">%</template>
+                      </el-input>
+                    </el-col>
+                    <el-col :span="1">-</el-col>
+                    <el-col :span="11">
+                      <el-input
+                        v-model="attendance.ratio2"
+                        :disabled="!(index+1==experienceForm.levels.length)"
+                      >
+                        <template slot="append" style="padding:0 10px">%</template>
+                      </el-input>
+                    </el-col>
+                  </el-row>
                 </el-col>
                 <el-col :span="1" style="margin-right:25px">
                   <i
                     class="el-icon-circle-plus"
                     @click="addLevelAndAttend()"
                     style="color:#409eff;font-size:27px;"
-                    v-show="index+1==experienceForm.levels.length"
+                    v-show="index+1==experienceForm.levels.length&&attendance.ratio2!=''"
                   ></i>
                 </el-col>
                 <el-col :span="1">
+                  <!-- v-show="index!=0||experienceForm.levels.length>1" -->
                   <i
                     class="el-icon-remove"
                     @click.prevent="removeLevelAndAttend(attendance)"
                     style="color:red;font-size:27px"
-                    v-show="index!=0||experienceForm.levels.length>1"
+                    v-show="index+1==experienceForm.levels.length && experienceForm.levels.length>1 "
                   ></i>
                 </el-col>
               </el-row>
@@ -114,7 +129,8 @@ export default {
         ],
         attendances: [
           {
-            value: ""
+            ratio1: "0",
+            ratio2: ""
           }
         ],
         checkExperience: "",
@@ -141,19 +157,24 @@ export default {
         ],
         attendances: [
           {
-            value: "0%"
+            ratio1: "0",
+            ratio2: "0"
           },
           {
-            value: "0%~20%"
+            ratio1: "0",
+            ratio2: "20"
           },
           {
-            value: "20%~50%"
+            ratio1: "20",
+            ratio2: "50"
           },
           {
-            value: "50%~70%"
+            ratio1: "50",
+            ratio2: "70"
           },
           {
-            value: "70%~100%"
+            ratio1: "70",
+            ratio2: "100"
           }
         ],
         checkExperience: 2,
@@ -163,14 +184,30 @@ export default {
     };
   },
   created() {
-    this.experienceForm = this.experienceFormInit;
+    this.getData();
   },
   methods: {
+    getData() {
+      this.$http.get("/api/systems").then(
+        res => {
+          this.experienceForm.checkExperience = parseInt(
+            res.data.attend_exp
+          );
+          this.experienceForm.workExperience = parseInt(
+            res.data.activity_exp
+          );
+          this.experienceForm.distance = parseInt(res.data.distance);
+          this.experienceForm.attendances = res.data.attendence;
+          this.experienceForm.levels = res.data.levels;
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
+          });
+        }
+      );
+    },
     removeLevelAndAttend(attendItem) {
-      //   var index = this.experienceForm.levels.indexOf(levelItem);
-      //   if (index !== -1) {
-      //     this.experienceForm.levels.splice(index, 1);
-      //   }
       var index1 = this.experienceForm.attendances.indexOf(attendItem);
       if (index1 !== -1) {
         this.experienceForm.attendances.splice(index1, 1);
@@ -185,7 +222,10 @@ export default {
         key: Date.now() + 0
       });
       this.experienceForm.attendances.push({
-        value: "",
+        ratio1: this.experienceForm.attendances[
+          this.experienceForm.attendances.length - 1
+        ].ratio2,
+        ratio2: "",
         key: Date.now() + 1
       });
     },
@@ -193,28 +233,60 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           var num = [];
-          var k=[];
+          var k = [];
+
           for (var i in this.experienceForm.levels) {
             num.push(this.experienceForm.levels[i].value);
           }
 
           if (this.isContinuityNum(num)) {
+            //连续
             //判断输入等级是否连续
-            console.log("连续");
+            var details = [];
+            for (var i in this.experienceForm.levels) {
+              details.push({
+                level: this.experienceForm.levels[i].value,
+                ratio: this.experienceForm.attendances[i].ratio2
+              });
+            }
+            var data = {
+              attend_exp: this.experienceForm.checkExperience,
+              activity_exp: this.experienceForm.workExperience,
+              distance: this.experienceForm.distance,
+              detail: details
+            };
+            this.$http.patch("/api/systems", data).then(
+              res => {
+                if (res.data.respCode == "1") {
+                  this.$alert("成功", "成功", {
+                    confirmButtonText: "确定"
+                  });
+                } else {
+                  this.$alert(res.data.respCode, "失败", {
+                    confirmButtonText: "确定"
+                  });
+                }
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            );
           } else {
             this.$alert("设置的等级不连续", "失败", {
               confirmButtonText: "确定"
             });
           }
         } else {
-          console.log("error submit!!");
           return false;
         }
       });
     },
     resetForm(formName) {
-      this.$refs[formName].resetFields();
+      // this.$refs[formName].resetFields();
       this.experienceForm = this.experienceFormInit;
+      this.onSubmit(formName);
     },
     //判断等级是否是连续的
     isContinuityNum(num) {
@@ -239,3 +311,8 @@ export default {
   }
 };
 </script>
+<style>
+.el-input-group__append {
+  padding: 0 10px !important;
+}
+</style>
