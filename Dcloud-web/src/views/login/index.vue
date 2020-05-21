@@ -207,12 +207,16 @@ export default {
                   } else if (res.data.role == "2") {
                     localStorage.setItem("roles", "superAdmin");
                   }
+
                   var date = new Date();
                   localStorage.setItem("loginTime", date.getTime()); //登录时间
                   this.loading = false;
+                  localStorage.setItem("Authorization", res.data.token);
+                  localStorage.setItem("account", this.loginForm.username);
                   localStorage.setItem("isLogin", true);
                   this.$router.push("/home");
-                } else {
+                } else {   
+                  this.loading = false;
                   this.$alert(res.data.respCode, "登录失败", {
                     confirmButtonText: "确定"
                   });
@@ -224,31 +228,6 @@ export default {
                 });
               }
             );
-            // this.$axios
-            //   .post("/api/loginByPassword", data, this.config)
-            //   .then(res => {
-            //     console.log(res.data);
-            //     if (res.data.respCode == "1") {
-            //       //登录成功
-            //       if (res.data.role == "0") {
-            //         //登录角色
-            //         localStorage.setItem("roles", "teacher");
-            //       } else if (res.data.role == "1") {
-            //         localStorage.setItem("roles", "admin");
-            //       } else if (res.data.role == "2") {
-            //         localStorage.setItem("roles", "superAdmin");
-            //       }
-            //       var date = new Date();
-            //       localStorage.setItem("loginTime", date.getTime()); //登录时间
-            //       this.loading = false;
-            //       localStorage.setItem("isLogin", true);
-            //       this.$router.push("/home");
-            //     } else {
-            //       this.$alert(res.data.respCode, "登录失败", {
-            //         confirmButtonText: "确定"
-            //       });
-            //     }
-            //   });
           }
         });
       } else {
@@ -283,10 +262,13 @@ export default {
                     var date = new Date();
                     localStorage.setItem("loginTime", date.getTime()); //登录时间
                     this.loading = false;
+                    localStorage.setItem("Authorization", res.data.token);
+                    localStorage.setItem("account", this.loginForm.username);
                     localStorage.setItem("isLogin", true);
                     this.$router.push("/home");
                   } else {
-                    this.$alert(res.data.respCode, "注册失败", {
+                    this.loading = false;
+                    this.$alert(res.data.respCode, "登录失败", {
                       confirmButtonText: "确定"
                     });
                   }
@@ -297,32 +279,6 @@ export default {
                   });
                 }
               );
-              // this.$axios
-              //   .post("/api/loginByCode", data, this.config)
-              //   .then(res => {
-              //     this.loading = false;
-              //     console.log(res.data);
-              //     if (res.data.respCode == "1") {
-              //       //登录成功
-              //       if (res.data.role == "0") {
-              //         //登录角色
-              //         localStorage.setItem("roles", "teacher");
-              //       } else if (res.data.role == "1") {
-              //         localStorage.setItem("roles", "admin");
-              //       } else if (res.data.role == "2") {
-              //         localStorage.setItem("roles", "superAdmin");
-              //       }
-              //       var date = new Date();
-              //       localStorage.setItem("loginTime", date.getTime()); //登录时间
-              //       this.loading = false;
-              //       localStorage.setItem("isLogin", true);
-              //       this.$router.push("/home");
-              //     } else {
-              //       this.$alert(res.data.respCode, "注册失败", {
-              //         confirmButtonText: "确定"
-              //       });
-              //     }
-              //   });
             }
           }
         });

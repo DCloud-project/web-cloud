@@ -203,7 +203,7 @@ const router = new Router({
             component: Layout,
             redirect: '/systemManage',
             name: 'systemManage',
-            roles: "superAdmin",
+            roles: "common",
             bread: true,
             children: [{
                     path: 'systemManage',
@@ -220,7 +220,7 @@ const router = new Router({
             component: Layout,
             redirect: '/schoolManage',
             name: 'schoolManage',
-            roles: "superAdmin",
+            roles: "common",
             bread: true,
             children: [{
                     path: 'schoolManage',
@@ -243,17 +243,22 @@ const router = new Router({
 const whiteList = ['/login']; //不需要登录能访问的path
 router.beforeEach((to, from, next) => {
     // console.log('beforeEach');
-    var userInfo = JSON.parse(localStorage.getItem('isLogin')); //获取缓存看是否登录过
+    var isLogin = JSON.parse(localStorage.getItem('isLogin')); //获取缓存看是否登录过
     var time = localStorage.getItem('loginTime');
     var nowTime = new Date().getTime();
+    let token = localStorage.getItem('Authorization');
     if (whiteList.indexOf(to.path) < 0) { //访问了需要登录才能访问的页面
-        if (userInfo === true && nowTime <= time + 604800000) { //登录过来直接进去，七天内登录不需要重新登录
+        if (isLogin === true && nowTime <= time + 2592000000 && token != null && token != '') { //登录过来直接进去，30天内登录不需要重新登录
             next();
         } else {
-            if (to.path == '/login' || to.path == '/signup') {
+            if (to.path == '/login' || to.path == '/signup' || to.path == '/forgetPassword') {
                 next();
             } else {
-                next('/login');
+                if (token === null || token === '') {
+                    next('/login');
+                } else {
+                    next();
+                }
             }
         }
     } else {

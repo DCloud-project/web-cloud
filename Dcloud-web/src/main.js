@@ -13,7 +13,7 @@ import '@/icons'
 import axios from 'axios'
 import VueResource from 'vue-resource'
 import authority from '@/store/authority'
-Vue.prototype.authority=authority
+Vue.prototype.authority = authority
 Vue.use(VueResource)
 Vue.prototype.$axios = axios
 
@@ -31,13 +31,24 @@ Vue.prototype.config = {
     }
 }
 Vue.http.interceptors.push((request, next) => {　 //http拦截
+    request.headers.set('token', localStorage.getItem('Authorization')) // 请求headers携带参数
     next((response) => {
         if (response.status === 200) {
-            return response
+            if (response.data.respCode == "401") {
+                localStorage.removeItem('Authorization');
+                localStorage.removeItem('isLogin');
+                router.push('/login');
+            }
+            return response;
+
+
         } else {
-            if (response.status != 500 && response.status != 403 && response.status != 404) {
+            if (response.status == 401) {
+                localStorage.removeItem('Authorization');
+                localStorage.removeItem('isLogin');
+                router.push('/login');
+            } else if (response.status != 500 && response.status != 403 && response.status != 404) {
                 // 错误处理
-            } else {
                 response.status = 'error'
             }
             return Promise.reject(response.status) // 必须返回

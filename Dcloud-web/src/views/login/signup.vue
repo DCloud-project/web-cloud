@@ -24,16 +24,6 @@
           placeholder="请输入邮箱"
         ></el-input>
       </el-form-item>
-      <!-- </el-form> -->
-      <!-- </el-row> -->
-      <!-- <el-row> -->
-      <!-- <el-form
-          autocomplete="on"
-          :model="loginForm"
-          :rules="loginRules"
-          ref="loginForm"
-          label-position="left"
-      >-->
       <el-form-item prop="message">
         <el-row>
           <el-col :span="15">
@@ -147,7 +137,7 @@ export default {
           var data = {
             email: this.loginForm.username
           };
-           this.$http.post("/api/sendCode", data).then(
+          this.$http.post("/api/sendCode", data).then(
             res => {
               localStorage.setItem("validateCode", res.data);
             },
@@ -188,30 +178,33 @@ export default {
               email: this.loginForm1.username,
               password: this.loginForm.pass
             };
-             this.$http.post("/api/sendCode", data).then(
-            res => {
-               this.loading = false;
-              if (res.data.respCode == "1") {
-                //注册成功  角色默认为教师
-                if (res.data.role == "1") {
-                  localStorage.setItem("roles", "teacher");
+            this.$http.post("/api/sendCode", data).then(
+              res => {
+                this.loading = false;
+                if (res.data.respCode == "1") {
+                  //注册成功  角色默认为教师
+                  if (res.data.role == "1") {
+                    localStorage.setItem("roles", "teacher");
+                  }
+                  var date = new Date();
+                  localStorage.setItem("loginTime", date.getTime()); //注册时间
+                  localStorage.setItem("isLogin", true);
+                  localStorage.setItem("Authorization", res.data.token);
+                  localStorage.setItem("account", this.loginForm.username);
+                  this.$router.push("/home");
+                } else {
+                   this.loading = false;
+                  this.$alert(res.data.respCode, "注册失败", {
+                    confirmButtonText: "确定"
+                  });
                 }
-                var date = new Date();
-                localStorage.setItem("loginTime", date.getTime()); //注册时间
-                localStorage.setItem("isLogin", true);
-                this.$router.push("/home");
-              } else{
-                this.$alert(res.data.respCode, "注册失败", {
-                  confirmButtonText: "确定"
+              },
+              res => {
+                this.$router.push({
+                  path: "/" + res
                 });
               }
-            },
-            res => {
-              this.$router.push({
-                path: "/" + res
-              });
-            }
-          );
+            );
           }
         } else {
           return false;

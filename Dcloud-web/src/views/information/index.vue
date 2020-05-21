@@ -12,7 +12,7 @@
           style="width:90%"
         >
           <!-- <el-form-item> -->
-          <el-upload
+          <!-- <el-upload
             class="avatar-uploader"
             action="https://jsonplaceholder.typicode.com/posts/"
             :show-file-list="false"
@@ -21,14 +21,21 @@
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+          </el-upload>-->
           <!-- </el-form-item> -->
           <el-form-item label="账号">
             <el-input v-model="ruleForm.email" disabled></el-input>
           </el-form-item>
-          <el-form-item label="昵称" prop="name">
-            <el-input v-model="ruleForm.name" placeholder="请输入昵称"></el-input>
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="ruleForm.name" placeholder="请输入名称"></el-input>
           </el-form-item>
+          <el-form-item label="工号" prop="sno">
+            <el-input v-model="ruleForm.sno" placeholder="请输入工号"></el-input>
+          </el-form-item>
+          <el-form-item label="昵称" prop="nickname">
+            <el-input v-model="ruleForm.nickname" placeholder="请输入昵称"></el-input>
+          </el-form-item>
+
           <el-form-item label="性别">
             <el-radio-group v-model="ruleForm.sex">
               <el-radio label="0">男</el-radio>
@@ -38,8 +45,24 @@
           <el-form-item label="学院" prop="school">
             <el-cascader v-model="ruleForm.school" :options="options" @change="handleChange"></el-cascader>
           </el-form-item>
+          <el-form-item label="出生日期">
+            <el-date-picker
+              value-format="yyyy-MM-dd"
+              v-model="ruleForm.birth"
+              type="date"
+              placeholder="选择日期"
+            ></el-date-picker>
+          </el-form-item>
           <el-form-item label="用户角色">
-            <el-tag type="success">老师</el-tag>
+            <el-tag type="success" v-if="ruleForm.role=='0'">老师</el-tag>
+            <el-tag type="success" v-if="ruleForm.role=='1'">管理员</el-tag>
+            <el-tag type="success" v-if="ruleForm.role=='2'">超级管理员</el-tag>
+          </el-form-item>
+          <el-form-item label="经验值">
+            <el-input v-model="ruleForm.exp" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="电话号码" prop="phone">
+            <el-input v-model="ruleForm.phone"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="submitForm('ruleForm')" style="width:40%">提交</el-button>
@@ -109,10 +132,29 @@ export default {
         callback();
       }
     };
+    var checkPhone = (rule, value, callback) => {
+      if (!value) {
+        // return callback(new Error("手机号不能为空"));
+        callback();
+      } else {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
+        console.log(reg.test(value));
+        if (reg.test(value)) {
+          callback();
+        } else {
+          return callback(new Error("请输入正确的手机号"));
+        }
+      }
+    };
     return {
       ruleForm: {
         email: "",
+        nickname: "",
+        exp: "",
         name: "",
+        birth: "",
+        phone: "",
+        sno: "",
         sex: "1",
         type: 1,
         school: []
@@ -124,244 +166,17 @@ export default {
       },
       rules: {
         name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
         school: [
-          { required: true, validator: validateSchool, trigger: "change" }
-        ]
+          { required: false, validator: validateSchool, trigger: "change" }
+        ],
+        phone: [{ validator: checkPhone, trigger: "blur" }]
       },
       rules2: {
         pass: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }]
       },
-      options: [
-        {
-          value: "1",
-          label: "福州大学",
-          children: [
-            {
-              value: "1.1",
-              label: "经济学",
-              children: [
-                {
-                  value: "1.1.1",
-                  label: "经济学"
-                },
-                {
-                  value: "1.1.2",
-                  label: "财政学"
-                },
-                {
-                  value: "1.1.3",
-                  label: "金融学"
-                },
-                {
-                  value: "1.1.4",
-                  label: "国际经济与贸易"
-                }
-              ]
-            },
-            {
-              value: "1.2",
-              label: "法学",
-              children: [
-                {
-                  value: "1.2.1",
-                  label: "法学"
-                },
-                {
-                  value: "1.2.2",
-                  label: "社会学"
-                }
-              ]
-            },
-            {
-              value: "1.3",
-              label: "文学",
-              children: [
-                {
-                  value: "1.3.1",
-                  label: "汉语言文学"
-                },
-                {
-                  value: "1.3.2",
-                  label: "英语"
-                },
-                {
-                  value: "1.3.3",
-                  label: "德语"
-                },
-                {
-                  value: "1.3.4",
-                  label: "日语"
-                }
-              ]
-            },
-            {
-              value: "1.4",
-              label: "理学",
-              children: [
-                {
-                  value: "1.4.1",
-                  label: "数学类"
-                },
-                {
-                  value: "1.4.2",
-                  label: "应用物理学"
-                },
-                {
-                  value: "1.4.3",
-                  label: "化学类"
-                },
-                {
-                  value: "1.4.4",
-                  label: "化学"
-                },
-                {
-                  value: "1.4.5",
-                  label: "生物技术"
-                },
-                {
-                  value: "1.4.6",
-                  label: "应用心理学"
-                }
-              ]
-            },
-            {
-              value: "1.5",
-              label: "工学",
-              children: [
-                {
-                  value: "1.5.1",
-                  label: "机械设计制造及其自动化"
-                },
-                {
-                  value: "1.5.2",
-                  label: "材料成型及控制工程"
-                },
-                {
-                  value: "1.5.3",
-                  label: "过程装备与控制工程"
-                },
-                {
-                  value: "1.5.4",
-                  label: "车辆工程"
-                },
-                {
-                  value: "1.5.5",
-                  label: "材料科学与工程"
-                },
-                {
-                  value: "1.5.6",
-                  label: "电气工程及其自动化"
-                },
-                {
-                  value: "1.5.7",
-                  label: "电子信息工程"
-                },
-                {
-                  value: "1.5.8",
-                  label: "电子科学与技术"
-                },
-                {
-                  value: "1.5.9",
-                  label: "微电子科学与工程"
-                },
-                {
-                  value: "1.5.10",
-                  label: "光电信息科学与工程"
-                },
-                {
-                  value: "1.5.11",
-                  label: "自动化"
-                },
-                {
-                  value: "1.5.12",
-                  label: "计算机类"
-                },
-                {
-                  value: "1.5.13",
-                  label: "软件工程"
-                },
-                {
-                  value: "1.5.14",
-                  label: "信息安全"
-                },
-                {
-                  value: "1.5.15",
-                  label: "物联网工程"
-                },
-                {
-                  value: "1.5.16",
-                  label: "数字媒体技术"
-                },
-                {
-                  value: "1.5.17",
-                  label: "土木工程"
-                },
-                {
-                  value: "1.5.18",
-                  label: "给排水科学与工程"
-                },
-                {
-                  value: "1.5.19",
-                  label: "水利水电工程"
-                },
-                {
-                  value: "1.5.20",
-                  label: "化学工程与工艺"
-                },
-                {
-                  value: "1.5.21",
-                  label: "制药工程"
-                },
-                {
-                  value: "1.5.22",
-                  label: "资源循环科学与工程"
-                },
-                {
-                  value: "1.5.23",
-                  label: "地质类"
-                },
-                {
-                  value: "1.5.24",
-                  label: "资源勘查工程"
-                },
-                {
-                  value: "1.5.25",
-                  label: "采矿工程"
-                },
-                {
-                  value: "1.5.26",
-                  label: "交通运输类"
-                },
-                {
-                  value: "1.5.27",
-                  label: "环境工程"
-                },
-                {
-                  value: "1.5.28",
-                  label: "食品科学与工程"
-                },
-                {
-                  value: "1.5.29",
-                  label: "建筑学 "
-                },
-                {
-                  value: "1.5.30",
-                  label: "风景园林"
-                },
-                {
-                  value: "1.5.31",
-                  label: "安全工程"
-                },
-                {
-                  value: "1.5.32",
-                  label: "生物工程"
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      options: [],
       imageUrl: ""
     };
   },
@@ -370,39 +185,56 @@ export default {
   },
   methods: {
     showUserInfo() {
-      //获取用户信息
-      this.$axios
-        .post("/baseUrl/api/mymanage/own?id=" + localStorage.getItem("user_id"))
-        .then(res => {
-          this.ruleForm.username = res.data.username;
-          this.ruleForm.name = res.data.name;
-          this.ruleForm.sex = res.data.sex.toString();
-          this.ruleForm.phone = res.data.email;
-        });
+      this.$http
+        .get("/api/user/info?" + "email=" + localStorage.getItem("account"))
+        .then(
+          res => {
+            this.ruleForm.email = localStorage.getItem("account");
+            this.ruleForm.name = res.data.name;
+            this.ruleForm.sno = res.data.sno;
+            this.ruleForm.nickname = res.data.nickname;
+            this.ruleForm.sex = res.data.sex.toString();
+            this.ruleForm.role = res.data.role;
+            this.ruleForm.school = res.data.school;
+            this.ruleForm.birth = res.data.birth;
+            this.ruleForm.phone = res.data.telphone;
+            this.ruleForm.exp = res.data.exp;
+          },
+          res => {
+            this.$router.push({
+              path: "/" + res
+            });
+          }
+        );
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$axios
-            .post(
-              "/baseUrl/api/mymanage/altering?id=" +
-                localStorage.getItem("user_id") +
-                "&name=" +
-                this.ruleForm.name +
-                "&sex=" +
-                this.ruleForm.sex +
-                "&email=" +
-                this.ruleForm.phone
-            )
-            .then(res => {
-              this.$alert("用户信息修改成功", "成功", {
-                confirmButtonText: "确定"
+          var data = {
+            email: this.ruleForm.email,
+            nickname: this.ruleForm.nickname,
+            sex: this.ruleForm.sex,
+            school: this.ruleForm.school,
+            telphone: this.ruleForm.phone,
+            birth: this.ruleForm.birth,
+            name: this.ruleForm.name,
+            sno: this.ruleForm.sno,
+            image: "0"
+          };
+          this.$http.put("/api/user/info", data).then(
+            res => {
+              if (res.data.respCode == "1") {
+                this.$alert("用户信息修改成功", "成功", {
+                  confirmButtonText: "确定"
+                });
+              }
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
               });
-            });
-        } else {
-          this.$alert("有必填项未填写或者填写错误", "警告", {
-            confirmButtonText: "确定"
-          });
+            }
+          );
           return false;
         }
       });
@@ -415,26 +247,33 @@ export default {
     submitForm2(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$axios
-            .post(
-              "/baseUrl/api/mymanage/alter?id=" +
-                localStorage.getItem("user_id") +
-                "&oldpwd=" +
-                this.ruleForm2.oldPass +
-                "&newpwd=" +
-                this.ruleForm2.pass
-            )
-            .then(res => {
-              if (res.data.respcode == "1000") {
-                this.$alert("密码修改成功", "成功", {
+          var data = {
+            email: localStorage.getItem("account"),
+            newpassword1: this.ruleForm2.pass,
+            newpassword2: this.ruleForm2.checkPass,
+            oldpassword: this.ruleForm2.oldPass
+          };
+          this.$http.post("/api/user/updatePassword", data).then(
+            res => {
+              if (res.data.respCode == "1") {
+                this.$alert("密码修改成功，跳转到登录页重新登录", "成功", {
                   confirmButtonText: "确定"
                 });
-              } else if (res.data.respcode == "1001") {
-                this.$alert("旧密码错误，修改失败", "失败", {
+                localStorage.removeItem("Authorization");
+                localStorage.removeItem("isLogin");
+                this.$router.push("/login");
+              } else {
+                this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
                 });
               }
-            });
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
+              });
+            }
+          );
         } else {
           this.$alert("有必填项未填写或者填写错误", "警告", {
             confirmButtonText: "确定"
@@ -462,9 +301,9 @@ export default {
       }
       return isJPG && isLt2M;
     },
-     handleChange(value) {
-        console.log(value);
-      }
+    handleChange(value) {
+      console.log(value);
+    }
   }
 };
 </script>
