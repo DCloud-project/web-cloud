@@ -182,6 +182,7 @@ export default {
   },
   created() {
     this.showUserInfo();
+    this.showSchool();
   },
   methods: {
     showUserInfo() {
@@ -195,7 +196,9 @@ export default {
             this.ruleForm.nickname = res.data.nickname;
             this.ruleForm.sex = res.data.sex.toString();
             this.ruleForm.role = res.data.role;
-            this.ruleForm.school = res.data.school;
+            if (res.data.school != "" && res.data.school != "0") {
+              this.ruleForm.school = res.data.school.split("/"); //字符分割
+            }
             this.ruleForm.birth = res.data.birth;
             this.ruleForm.phone = res.data.telphone;
             this.ruleForm.exp = res.data.exp;
@@ -206,6 +209,18 @@ export default {
             });
           }
         );
+    },
+    showSchool() {
+      this.$http.get("/api/schools?info=1").then(
+        res => {
+          this.options = res.data;
+        },
+        res => {
+          this.$router.push({
+            path: "/" + res
+          });
+        }
+      );
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -302,7 +317,13 @@ export default {
       return isJPG && isLt2M;
     },
     handleChange(value) {
-      console.log(value);
+      this.ruleForm.school = "";
+      for (var i = 0; i < value.length; i++) {
+        this.ruleForm.school += value[i];
+        if (i != value.length - 1) {
+          this.ruleForm.school += "/";
+        }
+      }
     }
   }
 };
