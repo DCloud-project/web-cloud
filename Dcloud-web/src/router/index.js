@@ -59,9 +59,9 @@ const router = new Router({
             children: [{
                 path: 'home',
                 component: () =>
-                    import ('@/views/homePage/index'),
+                    import ('@/views/home/index'),
                 name: 'home',
-                meta: { title: '首页', icon: 'dashboard', noCache: true }
+                meta: { title: '首页', icon: 'el-icon-s-home', noCache: true }
             }]
         },
         {
@@ -80,160 +80,160 @@ const router = new Router({
 
             }]
         },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/roleManage',
-            name: 'roleManage',
-            roles: "superAdmin",
-            children: [{
-                path: 'roleManage',
-                component: () =>
-                    import ('@/views/roleManage/index'),
-                name: 'roleManage',
-                meta: { title: '角色管理', icon: 'nested' },
-            }]
-        },
-        {
-            path: '/roleManage',
-            component: Layout,
-            name: 'roleManage1',
-            isShow: false,
-            meta: {
-                title: '角色管理'
-            },
-            roles: "superAdmin",
-            children: [{
-                path: 'permissionAssignment',
-                component: () =>
-                    import ('@/views/roleManage/permissionAssignment'),
-                name: 'permissionAssignment',
-                meta: { title: '权限分配', bread: true },
-            }]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/userManage',
-            name: 'User',
-            roles: "superAdmin",
-            bread: true,
-            children: [{
-                    path: 'userManage',
-                    name: 'userManage',
-                    component: () =>
-                        import ('@/views/userManage/index'),
-                    meta: { title: '用户管理', icon: 'user' }
-                },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/roleManage',
+        //     name: 'roleManage',
+        //     roles: "superAdmin",
+        //     children: [{
+        //         path: 'roleManage',
+        //         component: () =>
+        //             import ('@/views/roleManage/index'),
+        //         name: 'roleManage',
+        //         meta: { title: '角色管理', icon: 'nested' },
+        //     }]
+        // },
+        // {
+        //     path: '/roleManage',
+        //     component: Layout,
+        //     name: 'roleManage1',
+        //     isShow: false,
+        //     meta: {
+        //         title: '角色管理'
+        //     },
+        //     roles: "superAdmin",
+        //     children: [{
+        //         path: 'permissionAssignment',
+        //         component: () =>
+        //             import ('@/views/roleManage/permissionAssignment'),
+        //         name: 'permissionAssignment',
+        //         meta: { title: '权限分配', bread: true },
+        //     }]
+        // },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/userManage',
+        //     name: 'User',
+        //     roles: "superAdmin",
+        //     bread: true,
+        //     children: [{
+        //             path: 'userManage',
+        //             name: 'userManage',
+        //             component: () =>
+        //                 import ('@/views/userManage/index'),
+        //             meta: { title: '用户管理', icon: 'user' }
+        //         },
 
-            ]
-        },
-        {
-            path: '/userManage',
-            component: Layout,
-            name: 'userManage1',
-            isShow: false,
-            meta: {
-                title: '用户管理'
-            },
-            roles: "superAdmin",
-            children: [{
-                path: 'permissionAssignment',
-                component: () =>
-                    import ('@/views/userManage/permissionAssignment'),
-                name: 'permissionAssignment',
-                meta: { title: '权限分配', bread: true },
-            }]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/menuManage',
-            name: 'menuManage',
-            roles: "superAdmin",
-            bread: true,
-            children: [{
-                    path: 'menuManage',
-                    name: 'menuManage',
-                    component: () =>
-                        import ('@/views/menuManage/index'),
-                    meta: { title: '菜单管理', icon: 'component' }
-                },
+        //     ]
+        // },
+        // {
+        //     path: '/userManage',
+        //     component: Layout,
+        //     name: 'userManage1',
+        //     isShow: false,
+        //     meta: {
+        //         title: '用户管理'
+        //     },
+        //     roles: "superAdmin",
+        //     children: [{
+        //         path: 'permissionAssignment',
+        //         component: () =>
+        //             import ('@/views/userManage/permissionAssignment'),
+        //         name: 'permissionAssignment',
+        //         meta: { title: '权限分配', bread: true },
+        //     }]
+        // },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/menuManage',
+        //     name: 'menuManage',
+        //     roles: "superAdmin",
+        //     bread: true,
+        //     children: [{
+        //             path: 'menuManage',
+        //             name: 'menuManage',
+        //             component: () =>
+        //                 import ('@/views/menuManage/index'),
+        //             meta: { title: '菜单管理', icon: 'component' }
+        //         },
 
-            ]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/dataDictionary',
-            name: 'dataDictionary',
-            roles: "superAdmin",
-            bread: true,
-            children: [{
-                    path: 'dataDictionary',
-                    name: 'dataDictionary',
-                    component: () =>
-                        import ('@/views/dataDictionary/dictionaryList'),
-                    meta: { title: '数据字典', icon: 'tree' }
-                },
+        //     ]
+        // },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/dataDictionary',
+        //     name: 'dataDictionary',
+        //     roles: "superAdmin",
+        //     bread: true,
+        //     children: [{
+        //             path: 'dataDictionary',
+        //             name: 'dataDictionary',
+        //             component: () =>
+        //                 import ('@/views/dataDictionary/dictionaryList'),
+        //             meta: { title: '数据字典', icon: 'tree' }
+        //         },
 
-            ]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/dataDictionary',
-            name: 'dataDictionary1',
-            isShow: false,
-            bread: true,
-            meta: {
-                title: '数据字典'
-            },
-            children: [{
-                path: 'dataDictionary/addDictionary',
-                component: () =>
-                    import ('@/views/dataDictionary/addDictionary'),
-                name: 'addDictionary',
-                meta: { title: '数据字典管理', icon: 'dashboard', noCache: false },
+        //     ]
+        // },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/dataDictionary',
+        //     name: 'dataDictionary1',
+        //     isShow: false,
+        //     bread: true,
+        //     meta: {
+        //         title: '数据字典'
+        //     },
+        //     children: [{
+        //         path: 'dataDictionary/addDictionary',
+        //         component: () =>
+        //             import ('@/views/dataDictionary/addDictionary'),
+        //         name: 'addDictionary',
+        //         meta: { title: '数据字典管理', icon: 'dashboard', noCache: false },
 
-            }]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/systemManage',
-            name: 'systemManage',
-            roles: "common",
-            bread: true,
-            children: [{
-                    path: 'systemManage',
-                    name: 'systemManage',
-                    component: () =>
-                        import ('@/views/systemManage/index'),
-                    meta: { title: '系统管理', icon: 'product' }
-                },
+        //     }]
+        // },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/systemManage',
+        //     name: 'systemManage',
+        //     roles: "common",
+        //     bread: true,
+        //     children: [{
+        //             path: 'systemManage',
+        //             name: 'systemManage',
+        //             component: () =>
+        //                 import ('@/views/systemManage/index'),
+        //             meta: { title: '系统管理', icon: 'product' }
+        //         },
 
-            ]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/schoolManage',
-            name: 'schoolManage',
-            roles: "common",
-            bread: true,
-            children: [{
-                    path: 'schoolManage',
-                    name: 'schoolManage',
-                    component: () =>
-                        import ('@/views/schoolManage/index'),
-                    meta: { title: '学校管理', icon: 'table' }
-                },
+        //     ]
+        // },
+        // {
+        //     path: '/',
+        //     component: Layout,
+        //     redirect: '/schoolManage',
+        //     name: 'schoolManage',
+        //     roles: "common",
+        //     bread: true,
+        //     children: [{
+        //             path: 'schoolManage',
+        //             name: 'schoolManage',
+        //             component: () =>
+        //                 import ('@/views/schoolManage/index'),
+        //             meta: { title: '学校管理', icon: 'table' }
+        //         },
 
-            ]
-        },
-        { path: '*', redirect: '/404', hidden: true },
-        { path: '*', redirect: '/403', hidden: true },
+        //     ]
+        // },
+        // { path: '*', redirect: '/404', hidden: true },
+        // { path: '*', redirect: '/403', hidden: true },
     ]
 
 })
@@ -241,8 +241,16 @@ const router = new Router({
 
 // 未登陆过滤路由
 const whiteList = ['/login']; //不需要登录能访问的path
+var qq = false; // 页面刷新会初次加载 才会执行这个变量
 router.beforeEach((to, from, next) => {
     // console.log('beforeEach');
+    if(!qq){
+        qq = true; // 先让他变 true 不然跳转页面时会死循环
+    // 拿到数据后 就是把数据push到父组件里  
+    //  util.extendRouters 自己写的方法 
+       routerGo();
+        next(to.path);
+      }
     var isLogin = JSON.parse(localStorage.getItem('isLogin')); //获取缓存看是否登录过
     var time = localStorage.getItem('loginTime');
     var nowTime = new Date().getTime();
@@ -265,8 +273,54 @@ router.beforeEach((to, from, next) => {
         next();
     }
 });
-
-
+function routerGo() {
+    var menuList= JSON.parse(localStorage.getItem('menuList'));
+    console.log(menuList)
+    for (var i = 0; i < menuList.length; i++) {
+        // 创建路由配置
+        let url=menuList[i].url;
+        var route = {
+          path: '/',
+          component: Layout,
+          redirect:menuList[i].url,
+          roles:menuList[i].roles,
+          name: menuList[i].url.replace(/^\//, ''),
+           children: [{
+              path: menuList[i].url.replace(/^\//, ''),
+              component: () =>
+                        import ('@/views'+url+'/index'),
+              name: menuList[i].url.replace(/^\//, ''),
+              meta: {  icon: menuList[i].icon,title: menuList[i].name}
+          }]
+        };
+       router.options.routes.push(route)
+        if (menuList[i].children) {
+        for(var j=0;j<menuList[i].children.length;j++){
+          let curl=menuList[i].children[j].url
+          var routeChild = {
+          path: menuList[i].url,
+          component: Layout,
+          isShow: false,
+          meta: {
+              title:menuList[i].name
+          },
+          roles: "superAdmin",
+          name: menuList[i].url.replace(/^\//, '')+"1",
+           children: [{
+              path: menuList[i].children[j].url.replace(/^\//, ''),
+              component: () =>
+              import ('@/views'+url+curl),
+              name: menuList[i].children[j].url.replace(/^\//, ''),
+              meta: {title: menuList[i].children[j].name}
+          }]
+        };
+        router.options.routes.push(routeChild);
+        }
+      }
+    }
+   router.addRoutes(router.options.routes)
+  }
+  
 // export default new Router({
 //     scrollBehavior: () => ({ y: 0 }),
 //     routes: constantRouterMap,

@@ -493,6 +493,7 @@ export default {
               roleId: this.ruleForm.roleId,
               email: this.ruleForm.email
             };
+            console.log(data)
             this.$http.post("/api/user", data).then(
               res => {
                 if (res.data.respCode == "1") {
@@ -522,6 +523,7 @@ export default {
               roleId: this.ruleForm.roleId,
               email: this.ruleForm.email
             };
+            console.log(data)
             this.$http.put("/api/user", data).then(
               res => {
                 if (res.data.respCode == "1") {

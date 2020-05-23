@@ -43,7 +43,7 @@ export default {
       this.$router.push({ path: "/login" });
       localStorage.removeItem('Authorization');
       localStorage.removeItem('isLogin');
-      // location.reload(); // 为了重新实例化vue-router对象 避免bug
+      location.reload(); // 为了重新实例化vue-router对象 避免bug
     }
   }
 };

@@ -185,6 +185,10 @@ export default {
     },
     handleLogin() {
       console.log(this.config);
+      this.$http.get("/api/menus").then(
+                    res => {
+                localStorage.setItem("menuList", JSON.stringify(res.data));
+              })
       if (this.activeName == "1") {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
@@ -198,6 +202,7 @@ export default {
               res => {
                 if (res.data.respCode == "1") {
                   //登录成功
+                   
                   localStorage.setItem("roleId", res.data.role);
                   if (res.data.role == "0") {
                     //登录角色

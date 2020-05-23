@@ -64,7 +64,7 @@
         </el-table-column>
         <el-table-column label="层级" min-width="50" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.menuOrder}}级</span>
+            <span>{{scope.row.menuLevel}}级</span>
           </template>
         </el-table-column>
         <el-table-column label="父菜单" min-width="50" align="center">
@@ -157,6 +157,9 @@
           <el-radio v-model="menuForm.isVisible" label="1">可见</el-radio>
           <el-radio v-model="menuForm.isVisible" label="0">不可见</el-radio>
         </el-form-item>
+        <el-form-item label="层级" prop="menuLevel">
+          <el-input v-model="menuForm.menuLevel"></el-input>
+        </el-form-item>
         <el-form-item label="显示排序" prop="menuOrder">
           <el-input v-model="menuForm.menuOrder"></el-input>
         </el-form-item>
@@ -224,7 +227,8 @@ export default {
         isPage: "",
         url: "",
         isVisible: "1",
-        menuOrder: ""
+        menuOrder: "",
+        menuLevel:""
       },
       menus: {
         parentId: [
@@ -233,7 +237,8 @@ export default {
         name: [{ required: true, message: "请输入", trigger: "blur" }],
         isPage: [{ required: true, message: "请选择", trigger: "blur" }],
         isMenu: [{ required: true, message: "请选择", trigger: "blur" }],
-        menuOrder: [{ required: true, message: "请输入", trigger: "blur" }]
+        menuOrder: [{ required: true, message: "请输入", trigger: "blur" }],
+        menuLevel: [{ required: true, message: "请输入", trigger: "blur" }]
       },
       totalNum: 0,
       title: "新增用户",
@@ -268,13 +273,13 @@ export default {
       this.menuForm.url = "";
       this.menuForm.isVisible = "1";
       this.menuForm.menuOrder = "";
+      this.menuForm.menuLevel=""
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
     addData() {
       var auth = 0;
-      console.log(this.authority.authority)
       for (var i = 0; i < this.authority.authority.length; i++) {
         if (this.authority.authority[i] == "9") {
           auth = 1;
@@ -320,7 +325,6 @@ export default {
         .then(res => {
           this.listLoading = false;
           this.totalNum = res.data.total;
-          console.log(res.data.records);
           if (this.totalNum != 0) {
             this.list = res.data.records;
             for (var i = 0; i < this.list.length; i++) {
@@ -360,6 +364,11 @@ export default {
                 confirmButtonText: "确定"
               });
             }
+            this.$http.get("/api/menus").then(
+                    res => {
+                localStorage.setItem("menuList", JSON.stringify(res.data));
+              })
+              location.reload();
             this.showUserInfo(this.page);
           });
         })
@@ -402,6 +411,11 @@ export default {
                   confirmButtonText: "确定"
                 });
               }
+              this.$http.get("/api/menus").then(
+                    res => {
+                localStorage.setItem("menuList", JSON.stringify(res.data));
+              })
+              location.reload();
               this.showUserInfo(this.page);
             });
           })
@@ -482,6 +496,7 @@ export default {
             return val;
           }
           this.list = toTree(data);
+          console.log(this.list)
           // for (var i = 0; i < this.list.length; i++) {
           //   this.list[i].parentId = this.parentFind(this.list[i].parentId);
           // }
@@ -502,7 +517,7 @@ export default {
     },
 
     getParentList() {
-      this.$http.get("/api/menus").then(res => {
+      this.$http.get("/api/menus?parent=1").then(res => {
         this.listLoading = false;
         this.parentList = res.data;
         this.parentList.push("无");
@@ -524,7 +539,8 @@ export default {
         url: this.menuForm.url,
         is_visible: this.menuForm.isVisible,
         is_menu: this.menuForm.isMenu,
-        menu_order: this.menuForm.menuOrder
+        menu_order: this.menuForm.menuOrder,
+        menu_level:this.menuForm.menuLevel
       };
       var addData = {
         parent_name: this.menuForm.parentId,
@@ -534,20 +550,27 @@ export default {
         url: this.menuForm.url,
         is_visible: this.menuForm.isVisible,
         is_menu: this.menuForm.isMenu,
-        menu_order: this.menuForm.menuOrder
+        menu_order: this.menuForm.menuOrder,
+        menu_level:this.menuForm.menuLevel
       };
       console.log(addData)
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.dialogFormVisible = false;
           if (this.title == "新增菜单") {
+            console.log(addData)
             this.$http.post("/api/menus", addData).then(res => {
-              console.log(res.data)
               if (res.data.respCode == "1") {
                 this.$alert("菜单新增成功", "成功", {
                   confirmButtonText: "确定"
                 });
+               this.$http.get("/api/menus").then(
+                    res => {
+                localStorage.setItem("menuList", JSON.stringify(res.data));
+              })
+              location.reload();
                 this.showUserInfo(this.page);
+
               } else {
                 this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
@@ -562,6 +585,11 @@ export default {
                 this.$alert("菜单修改成功", "成功", {
                   confirmButtonText: "确定"
                 });
+                this.$http.get("/api/menus").then(
+                    res => {
+                localStorage.setItem("menuList", JSON.stringify(res.data));
+              })
+              location.reload();
                 this.showUserInfo(this.page);
               } else {
                 this.$alert("菜单修改失败", "失败", {

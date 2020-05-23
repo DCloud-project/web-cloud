@@ -14,7 +14,7 @@
         <!-- <span slot="title">Dcloud</span> -->
         <span>Dcloud</span>
       </el-menu-item>
-       <el-menu-item index="10" v-show="isCollapse">
+      <el-menu-item index="10" v-show="isCollapse">
         <img src="../../../../assets/cloudMenu.png" style="width:35px;margin-left:-20px" />
       </el-menu-item>
       <sidebar-item v-for="route in routes" :key="route.name" :item="route" :base-path="route.path"></sidebar-item>
@@ -25,17 +25,19 @@
 <script>
 import { mapGetters } from "vuex";
 import SidebarItem from "./SidebarItem";
+import Layout from "../../Layout"
 
 export default {
   components: { SidebarItem },
   computed: {
-    ...mapGetters(["sidebar"]),
+    ...mapGetters(["sidebar", "permission_routers"]),
     routes() {
+   //  this.routerGo;
       return this.$router.options.routes;
     },
     isCollapse() {
       return !this.sidebar.opened;
-    }
+    },
   }
 };
 </script>

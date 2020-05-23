@@ -7,7 +7,7 @@
           <span>当前正在为</span>
         </el-form-item>
         <el-form-item>
-          <el-tag>{{ this.$route.query.username}}</el-tag>
+           <el-tag>{{ this.$route.query.username}}</el-tag>
         </el-form-item>
         <el-form-item>
           <span>用户分配权限</span>
@@ -54,7 +54,7 @@
         <el-checkbox label="4">分配小组</el-checkbox>
       </el-checkbox-group>
       <div class="foot">
-        <el-button type="primary" class="but">保存</el-button>
+        <el-button type="primary" class="but" @click="saveUserPer()">保存</el-button>
         <el-button type="info" plain  class="but" @click="reset()">重置</el-button>
       </div>
     </div>
@@ -77,12 +77,18 @@ export default {
       }]
     };
   },
+  created() {
+       
+    },
   methods:{
     reset(){
       this.checkList=[];
       this.menuList=[];
       this.classList=[];
       this.school=[];
+    },
+    saveUserPer(){
+      console.log(this.checkList)
     }
   }
 };
