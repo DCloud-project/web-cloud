@@ -123,9 +123,11 @@ export default {
         )
         .then(res => {
           if (res.data.respCode == "1") {
-            this.$http.get("/api/rolePower?role_id=" + this.$route.query.id).then(res => {
-              this.authority.authority = res.data;
-            });
+            this.$http
+              .get("/api/rolePower?role_id=" + this.$route.query.id)
+              .then(res => {
+                localStorage.setItem("authority", JSON.stringify(res.data));
+              });
             this.$alert("保存成功", "成功", {
               confirmButtonText: "确定"
             });

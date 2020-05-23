@@ -9,77 +9,77 @@ import Layout from '../views/layout/Layout'
 const router = new Router({
     mode: 'history', //去除#
     routes: [{
-            path: '/login',
+        path: '/login',
+        component: () =>
+            import('@/views/login/index'),
+        hidden: true,
+    },
+    {
+        path: '/signup',
+        component: () =>
+            import('@/views/login/signup'),
+        hidden: true,
+    },
+    {
+        path: '/forgetPassword',
+        component: () =>
+            import('@/views/login/forgetPassword'),
+        hidden: true,
+    },
+    {
+        path: '/404',
+        component: () =>
+            import('@/views/errorPage/404'),
+        hidden: true
+    },
+    {
+        path: '/403',
+        component: () =>
+            import('@/views/errorPage/403'),
+        hidden: true
+    },
+    {
+        path: '/500',
+        component: () =>
+            import('@/views/errorPage/500'),
+        hidden: true
+    },
+    {
+        path: '/error',
+        component: () =>
+            import('@/views/errorPage/error'),
+        hidden: true
+    },
+    {
+        path: '/',
+        component: Layout,
+        redirect: '/home',
+        name: 'Home',
+        roles: "common",
+        children: [{
+            path: 'home',
             component: () =>
-                import ('@/views/login/index'),
-            hidden: true,
-        },
-        {
-            path: '/signup',
+                import('@/views/home/index'),
+            name: 'home',
+            meta: { title: '首页', icon: 'el-icon-s-home', noCache: true }
+        }]
+    },
+    {
+        path: '/',
+        component: Layout,
+        redirect: '/information',
+        name: 'information',
+        isShow: false,
+
+        children: [{
+            path: 'information',
             component: () =>
-                import ('@/views/login/signup'),
-            hidden: true,
-        },
-        {
-            path: '/forgetPassword',
-            component: () =>
-                import ('@/views/login/forgetPassword'),
-            hidden: true,
-        },
-        {
-            path: '/404',
-            component: () =>
-                import ('@/views/errorPage/404'),
-            hidden: true
-        },
-        {
-            path: '/403',
-            component: () =>
-                import ('@/views/errorPage/403'),
-            hidden: true
-        },
-        {
-            path: '/500',
-            component: () =>
-                import ('@/views/errorPage/500'),
-            hidden: true
-        },
-        {
-            path: '/error',
-            component: () =>
-                import ('@/views/errorPage/error'),
-            hidden: true
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/home',
-            name: 'Home',
-            roles: "common",
-            children: [{
-                path: 'home',
-                component: () =>
-                    import ('@/views/home/index'),
-                name: 'home',
-                meta: { title: '首页', icon: 'el-icon-s-home', noCache: true }
-            }]
-        },
-        {
-            path: '/',
-            component: Layout,
-            redirect: '/information',
+                import('@/views/information/index'),
             name: 'information',
-            isShow: false,
+            meta: { title: '个人信息', icon: 'dashboard', noCache: false },
 
-            children: [{
-                path: 'information',
-                component: () =>
-                    import ('@/views/information/index'),
-                name: 'information',
-                meta: { title: '个人信息', icon: 'dashboard', noCache: false },
-
-            }]
-        },
+        }]
+    },
         // {
         //     path: '/',
         //     component: Layout,
@@ -241,16 +241,16 @@ const router = new Router({
 
 // 未登陆过滤路由
 const whiteList = ['/login']; //不需要登录能访问的path
-var qq = false; // 页面刷新会初次加载 才会执行这个变量
+var qq = false; // 页面刷新货初次加载 才会执行这个变量
 router.beforeEach((to, from, next) => {
     // console.log('beforeEach');
-    if(!qq){
+    if (!qq) {
         qq = true; // 先让他变 true 不然跳转页面时会死循环
-    // 拿到数据后 就是把数据push到父组件里  
-    //  util.extendRouters 自己写的方法 
-       routerGo();
+        // 拿到数据后 就是把数据push到父组件里  
+        //  util.extendRouters 自己写的方法 
+        routerGo();
         next(to.path);
-      }
+    }
     var isLogin = JSON.parse(localStorage.getItem('isLogin')); //获取缓存看是否登录过
     var time = localStorage.getItem('loginTime');
     var nowTime = new Date().getTime();
@@ -274,53 +274,54 @@ router.beforeEach((to, from, next) => {
     }
 });
 function routerGo() {
-    var menuList= JSON.parse(localStorage.getItem('menuList'));
-    console.log(menuList)
+    var menuList = JSON.parse(localStorage.getItem('menuList'));
     for (var i = 0; i < menuList.length; i++) {
         // 创建路由配置
-        let url=menuList[i].url;
+        let url = menuList[i].url;
         var route = {
-          path: '/',
-          component: Layout,
-          redirect:menuList[i].url,
-          roles:menuList[i].roles,
-          name: menuList[i].url.replace(/^\//, ''),
-           children: [{
-              path: menuList[i].url.replace(/^\//, ''),
-              component: () =>
-                        import ('@/views'+url+'/index'),
-              name: menuList[i].url.replace(/^\//, ''),
-              meta: {  icon: menuList[i].icon,title: menuList[i].name}
-          }]
+            path: '/',
+            component: Layout,
+            redirect: menuList[i].url,
+            roles: menuList[i].roles,
+            name: menuList[i].url.replace(/^\//, ''),
+            children: [{
+                path: menuList[i].url.replace(/^\//, ''),
+                component: () =>
+                    import('@/views' + url + '/index'),
+                name: menuList[i].url.replace(/^\//, ''),
+                meta: { icon: menuList[i].icon, title: menuList[i].name }
+            }]
         };
-       router.options.routes.push(route)
+        router.options.routes.push(route)
         if (menuList[i].children) {
-        for(var j=0;j<menuList[i].children.length;j++){
-          let curl=menuList[i].children[j].url
-          var routeChild = {
-          path: menuList[i].url,
-          component: Layout,
-          isShow: false,
-          meta: {
-              title:menuList[i].name
-          },
-          roles: "superAdmin",
-          name: menuList[i].url.replace(/^\//, '')+"1",
-           children: [{
-              path: menuList[i].children[j].url.replace(/^\//, ''),
-              component: () =>
-              import ('@/views'+url+curl),
-              name: menuList[i].children[j].url.replace(/^\//, ''),
-              meta: {title: menuList[i].children[j].name}
-          }]
-        };
-        router.options.routes.push(routeChild);
+            for (var j = 0; j < menuList[i].children.length; j++) {
+                let curl = menuList[i].children[j].url
+                if (curl) {
+                    var routeChild = {
+                        path: menuList[i].url,
+                        component: Layout,
+                        isShow: false,
+                        meta: {
+                            title: menuList[i].name
+                        },
+                        roles: "superAdmin",
+                        name: menuList[i].url.replace(/^\//, '') + "1",
+                        children: [{
+                            path: menuList[i].children[j].url.replace(/^\//, ''),
+                            component: () =>
+                                import('@/views' + url + curl),
+                            name: menuList[i].children[j].url.replace(/^\//, ''),
+                            meta: { title: menuList[i].children[j].name }
+                        }]
+                    };
+                    router.options.routes.push(routeChild);
+                }
+            }
         }
-      }
     }
-   router.addRoutes(router.options.routes)
-  }
-  
+    router.addRoutes(router.options.routes)
+}
+
 // export default new Router({
 //     scrollBehavior: () => ({ y: 0 }),
 //     routes: constantRouterMap,

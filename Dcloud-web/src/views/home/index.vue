@@ -45,21 +45,16 @@ export default {
       ]
     };
   },
- created() {
-  this.showAuthorityList();
+  created() {
+    this.showAuthorityList();
   },
   methods: {
-    showAuthorityList(){
-      var roleId=localStorage.getItem("roleId");
-      this.$http
-        .get(
-          "/api/rolePower?role_id=" +roleId)
-        .then(res => {
-         this.authority.authority=res.data;
-        });
-      
+    showAuthorityList() {
+      var roleId = localStorage.getItem("roleId");
+      this.$http.get("/api/rolePower?role_id=" + roleId).then(res => {
+        localStorage.setItem("authority", JSON.stringify(res.data));
+      });
     }
-    
   }
 };
 </script>

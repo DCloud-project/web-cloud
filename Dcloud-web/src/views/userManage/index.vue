@@ -230,9 +230,10 @@ export default {
       }
     },
     getStateAu() {
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "4") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "4") {
             this.roleAu = true;
           }
         }
@@ -244,23 +245,24 @@ export default {
       };
       var auth = 0;
       //恢复权限
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "5") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "5") {
             auth = 1;
           }
         }
       }
-      var auth1=0;
+      var auth1 = 0;
       //禁用权限
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "8") {
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "8") {
             auth1 = 1;
           }
         }
       }
-      if ((auth&&row.state==1)||(auth1&&row.state==0)) {
+      if ((auth && row.state == 1) || (auth1 && row.state == 0)) {
         this.$http.patch("/api/user", data).then(
           res => {
             // success callback
@@ -284,23 +286,24 @@ export default {
           }
         );
       } else {
-        if(row.state==0){
-        this.$alert("你没有禁用用户状态权限", {
-          confirmButtonText: "确定"
-        });
-        }else{
-           this.$alert("你没有恢复用户状态权限", {
-          confirmButtonText: "确定"
-        })
+        if (row.state == 0) {
+          this.$alert("你没有禁用用户状态权限", {
+            confirmButtonText: "确定"
+          });
+        } else {
+          this.$alert("你没有恢复用户状态权限", {
+            confirmButtonText: "确定"
+          });
         }
       }
     },
     resetPass(row) {
       //重置密码
       var auth = 0;
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "6") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "6") {
             auth = 1;
           }
         }
@@ -331,9 +334,10 @@ export default {
     deleteData() {
       //批量删除
       var auth = 0;
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "2") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "2") {
             auth = 1;
           }
         }
@@ -388,9 +392,10 @@ export default {
     },
     searchData() {
       var auth = 0;
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "7") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "7") {
             auth = 1;
           }
         }
@@ -465,9 +470,10 @@ export default {
     },
     addData() {
       var auth = 0;
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "1") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "1") {
             auth = 1;
           }
         }
@@ -493,7 +499,6 @@ export default {
               roleId: this.ruleForm.roleId,
               email: this.ruleForm.email
             };
-            console.log(data)
             this.$http.post("/api/user", data).then(
               res => {
                 if (res.data.respCode == "1") {
@@ -523,7 +528,7 @@ export default {
               roleId: this.ruleForm.roleId,
               email: this.ruleForm.email
             };
-            console.log(data)
+            console.log(data);
             this.$http.put("/api/user", data).then(
               res => {
                 if (res.data.respCode == "1") {
@@ -569,9 +574,11 @@ export default {
     editData(row) {
       this.getStateAu();
       var auth = 0;
-      if (this.authority.authority) {
-        for (var i = 0; i < this.authority.authority.length; i++) {
-          if (this.authority.authority[i] == "3") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      console.log(authority);
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "3") {
             auth = 1;
           }
         }

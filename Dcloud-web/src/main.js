@@ -32,32 +32,32 @@ Vue.prototype.config = {
         "Content-Type": "application/json"
     }
 }
-// Vue.http.interceptors.push((request, next) => {　 //http拦截
-//     request.headers.set('token', localStorage.getItem('Authorization')) // 请求headers携带参数
-//     next((response) => {
-//         if (response.status === 200) {
-//             if (response.data.respCode == "401") {
-//                 localStorage.removeItem('Authorization');
-//                 localStorage.removeItem('isLogin');
-//                 router.push('/login');
-//             }
-//             return response;
+Vue.http.interceptors.push((request, next) => {　 //http拦截
+    request.headers.set('token', localStorage.getItem('Authorization')) // 请求headers携带参数
+    next((response) => {
+        if (response.status === 200) {
+            if (response.data.respCode == "401") {
+                localStorage.removeItem('Authorization');
+                localStorage.removeItem('isLogin');
+                router.push('/login');
+            }
+            return response;
 
 
-//         } else {
-//             if (response.status == 401) {
-//                 localStorage.removeItem('Authorization');
-//                 localStorage.removeItem('isLogin');
-//                 router.push('/login');
-//             } else if (response.status != 500 && response.status != 403 && response.status != 404) {
-//                 // 错误处理
-//                 response.status = 'error'
-//             }
-//             return Promise.reject(response.status) // 必须返回
-//         }
-//     });
+        } else {
+            if (response.status == 401) {
+                localStorage.removeItem('Authorization');
+                localStorage.removeItem('isLogin');
+                router.push('/login');
+            } else if (response.status != 500 && response.status != 403 && response.status != 404) {
+                // 错误处理
+                response.status = 'error'
+            }
+            return Promise.reject(response.status) // 必须返回
+        }
+    });
 
-// });
+});
 new Vue({
     el: '#app',
     router,

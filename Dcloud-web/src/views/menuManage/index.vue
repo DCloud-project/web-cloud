@@ -38,7 +38,6 @@
         style="width: 100%"
         @selection-change="handleSelectionChange"
         row-key="id"
-        default-expand-all
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         :header-cell-style="{background:'#eef1f6',color:'#606266'}"
       >
@@ -228,7 +227,7 @@ export default {
         url: "",
         isVisible: "1",
         menuOrder: "",
-        menuLevel:""
+        menuLevel: ""
       },
       menus: {
         parentId: [
@@ -273,15 +272,16 @@ export default {
       this.menuForm.url = "";
       this.menuForm.isVisible = "1";
       this.menuForm.menuOrder = "";
-      this.menuForm.menuLevel=""
+      this.menuForm.menuLevel = "";
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
     addData() {
       var auth = 0;
-      for (var i = 0; i < this.authority.authority.length; i++) {
-        if (this.authority.authority[i] == "9") {
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      for (var i = 0; i < authority.length; i++) {
+        if (authority[i] == "9") {
           auth = 1;
         }
       }
@@ -296,110 +296,65 @@ export default {
       }
     },
     searchData() {
-      var auth=0;
-      if(this.authority.authority){
-      for(var i=0;i<this.authority.authority.length;i++){
-        if(this.authority.authority[i]=="12"){
-          auth =1
+      var auth = 0;
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "12") {
+            auth = 1;
+          }
         }
       }
-      }
-      if(auth){
-      this.list = [];
-      this.listLoading = true;
-      this.page = 1;
-      var data = {
-        page: this.page,
-        name: this.formInline.menus,
-        state: this.formInline.state
-      };
-      this.$http
-        .get(
-          "/api/menus?page=" +
-            data.page +
-            "&name=" +
-            data.name +
-            "&is_visible=" +
-            data.state
-        )
-        .then(res => {
-          this.listLoading = false;
-          this.totalNum = res.data.total;
-          if (this.totalNum != 0) {
-            this.list = res.data.records;
-            for (var i = 0; i < this.list.length; i++) {
-              this.list[i].parentId = this.parentFind(this.list[i].parentId);
+      if (auth) {
+        this.list = [];
+        this.listLoading = true;
+        this.page = 1;
+        var data = {
+          page: this.page,
+          name: this.formInline.menus,
+          state: this.formInline.state
+        };
+        this.$http
+          .get(
+            "/api/menus?page=" +
+              data.page +
+              "&name=" +
+              data.name +
+              "&is_visible=" +
+              data.state
+          )
+          .then(res => {
+            this.listLoading = false;
+            this.totalNum = res.data.total;
+            if (this.totalNum != 0) {
+              this.list = res.data.records;
+              for (var i = 0; i < this.list.length; i++) {
+                this.list[i].parentId = this.parentFind(this.list[i].parentId);
+              }
             }
-          }
-        });
-      }else{
+          });
+      } else {
         this.$alert("你没有查询菜单权限", {
-                    confirmButtonText: "确定"
-                  });
+          confirmButtonText: "确定"
+        });
       }
     },
 
     deleteUser(row) {
       //单个删除
-      var auth=0;
-      if(this.authority.authority){
-      for(var i=0;i<this.authority.authority.length;i++){
-        if(this.authority.authority[i]=="11"){
-          auth =1
+      var auth = 0;
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "11") {
+            auth = 1;
+          }
         }
       }
-      }
-      if(auth){
-      var del_list = [];
-      del_list.push(row.id);
-      this.$confirm("确定要删除该用户？", "删除用户", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "info"
-      })
-        .then(() => {
-          this.$http.delete("/api/menus?ids=" + del_list).then(res => {
-            if (res.data.respCode == "1") {
-              this.$alert("删除成功", "成功", {
-                confirmButtonText: "确定"
-              });
-            }
-            this.$http.get("/api/menus").then(
-                    res => {
-                localStorage.setItem("menuList", JSON.stringify(res.data));
-              })
-              location.reload();
-            this.showUserInfo(this.page);
-          });
-        })
-        .catch(() => {});
-      }else{
-        this.$alert("你没有删除菜单权限", {
-                    confirmButtonText: "确定"
-                  });
-      }
-    },
-    deleteData() {
-      //批量删除
-      var auth=0;
-      if(this.authority.authority){
-      for(var i=0;i<this.authority.authority.length;i++){
-        if(this.authority.authority[i]=="11"){
-          auth =1
-        }
-      }
-      }
-      if(auth){
-      if (this.multipleSelection.length == 0) {
-        this.$alert("请至少选中一条数据", "批量删除", {
-          confirmButtonText: "确定"
-        });
-      } else {
+      if (auth) {
         var del_list = [];
-        for (var i in this.multipleSelection) {
-          del_list.push(this.multipleSelection[i].id);
-        }
-        this.$confirm("确定要删除所选择的菜单？", "删除菜单", {
+        del_list.push(row.id);
+        this.$confirm("确定要删除该菜单？", "删除菜单", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "info"
@@ -410,21 +365,67 @@ export default {
                 this.$alert("删除成功", "成功", {
                   confirmButtonText: "确定"
                 });
+                this.$http.get("/api/menus").then(res => {
+                  localStorage.setItem("menuList", JSON.stringify(res.data));
+                });
+                location.reload();
+                this.showUserInfo(this.page);
               }
-              this.$http.get("/api/menus").then(
-                    res => {
-                localStorage.setItem("menuList", JSON.stringify(res.data));
-              })
-              location.reload();
-              this.showUserInfo(this.page);
             });
           })
           .catch(() => {});
-      }
-      }else{
+      } else {
         this.$alert("你没有删除菜单权限", {
+          confirmButtonText: "确定"
+        });
+      }
+    },
+    deleteData() {
+      //批量删除
+      var auth = 0;
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "11") {
+            auth = 1;
+          }
+        }
+      }
+      if (auth) {
+        if (this.multipleSelection.length == 0) {
+          this.$alert("请至少选中一条数据", "批量删除", {
+            confirmButtonText: "确定"
+          });
+        } else {
+          var del_list = [];
+          for (var i in this.multipleSelection) {
+            del_list.push(this.multipleSelection[i].id);
+          }
+          this.$confirm("确定要删除所选择的菜单？", "删除菜单", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "info"
+          })
+            .then(() => {
+              this.$http.delete("/api/menus?ids=" + del_list).then(res => {
+                if (res.data.respCode == "1") {
+                  this.$alert("删除成功", "成功", {
                     confirmButtonText: "确定"
                   });
+                  this.$http.get("/api/menus").then(res => {
+                    localStorage.setItem("menuList", JSON.stringify(res.data));
+                  });
+                  location.reload();
+                  this.showUserInfo(this.page);
+                }
+              });
+            })
+            .catch(() => {});
+        }
+      } else {
+        this.$alert("你没有删除菜单权限", {
+          confirmButtonText: "确定"
+        });
       }
     },
     parentFind(id) {
@@ -438,26 +439,27 @@ export default {
       return parentName;
     },
     editData(row) {
-      var auth=0;
-      if(this.authority.authority){
-      for(var i=0;i<this.authority.authority.length;i++){
-        if(this.authority.authority[i]=="10"){
-          auth =1
+      var auth = 0;
+      var authority = JSON.parse(localStorage.getItem("authority"));
+      if (authority) {
+        for (var i = 0; i < authority.length; i++) {
+          if (authority[i] == "10") {
+            auth = 1;
+          }
         }
       }
-      }
-      if(auth){
-      this.menuForm = row;
-      this.menuForm.parentId = this.menuForm.parentId.toString();
-      this.menuForm.isPage = this.menuForm.isPage.toString();
-      this.menuForm.isMenu = this.menuForm.isMenu.toString();
-      this.menuForm.isVisible = this.menuForm.isVisible.toString();
-      this.title = "编辑菜单";
-      this.dialogFormVisible = true;
-      }else{
+      if (auth) {
+        this.menuForm = row;
+        this.menuForm.parentId = this.menuForm.parentId.toString();
+        this.menuForm.isPage = this.menuForm.isPage.toString();
+        this.menuForm.isMenu = this.menuForm.isMenu.toString();
+        this.menuForm.isVisible = this.menuForm.isVisible.toString();
+        this.title = "编辑菜单";
+        this.dialogFormVisible = true;
+      } else {
         this.$alert("你没有编辑菜单权限", {
-                    confirmButtonText: "确定"
-                  });
+          confirmButtonText: "确定"
+        });
       }
     },
     showUserInfo(page) {
@@ -496,7 +498,7 @@ export default {
             return val;
           }
           this.list = toTree(data);
-          console.log(this.list)
+          console.log(this.list);
           // for (var i = 0; i < this.list.length; i++) {
           //   this.list[i].parentId = this.parentFind(this.list[i].parentId);
           // }
@@ -540,7 +542,7 @@ export default {
         is_visible: this.menuForm.isVisible,
         is_menu: this.menuForm.isMenu,
         menu_order: this.menuForm.menuOrder,
-        menu_level:this.menuForm.menuLevel
+        menu_level: this.menuForm.menuLevel
       };
       var addData = {
         parent_name: this.menuForm.parentId,
@@ -551,26 +553,23 @@ export default {
         is_visible: this.menuForm.isVisible,
         is_menu: this.menuForm.isMenu,
         menu_order: this.menuForm.menuOrder,
-        menu_level:this.menuForm.menuLevel
+        menu_level: this.menuForm.menuLevel
       };
-      console.log(addData)
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.dialogFormVisible = false;
           if (this.title == "新增菜单") {
-            console.log(addData)
+            console.log(addData);
             this.$http.post("/api/menus", addData).then(res => {
               if (res.data.respCode == "1") {
                 this.$alert("菜单新增成功", "成功", {
                   confirmButtonText: "确定"
                 });
-               this.$http.get("/api/menus").then(
-                    res => {
-                localStorage.setItem("menuList", JSON.stringify(res.data));
-              })
-              location.reload();
+                this.$http.get("/api/menus").then(res => {
+                  localStorage.setItem("menuList", JSON.stringify(res.data));
+                });
+                location.reload();
                 this.showUserInfo(this.page);
-
               } else {
                 this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
@@ -585,11 +584,10 @@ export default {
                 this.$alert("菜单修改成功", "成功", {
                   confirmButtonText: "确定"
                 });
-                this.$http.get("/api/menus").then(
-                    res => {
-                localStorage.setItem("menuList", JSON.stringify(res.data));
-              })
-              location.reload();
+                this.$http.get("/api/menus").then(res => {
+                  localStorage.setItem("menuList", JSON.stringify(res.data));
+                });
+                location.reload();
                 this.showUserInfo(this.page);
               } else {
                 this.$alert("菜单修改失败", "失败", {
