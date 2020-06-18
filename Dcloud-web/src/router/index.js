@@ -275,6 +275,7 @@ router.beforeEach((to, from, next) => {
 });
 function routerGo() {
     var menuList = JSON.parse(localStorage.getItem('menuList'));
+    if(menuList!=null){
     for (var i = 0; i < menuList.length; i++) {
         // 创建路由配置
         let url = menuList[i].url;
@@ -319,6 +320,7 @@ function routerGo() {
             }
         }
     }
+}
     router.addRoutes(router.options.routes)
 }
 

@@ -47,6 +47,7 @@ export default {
   },
   created() {
     this.showAuthorityList();
+    this.getMenuList
   },
   methods: {
     showAuthorityList() {
@@ -54,6 +55,11 @@ export default {
       this.$http.get("/api/rolePower?role_id=" + roleId).then(res => {
         localStorage.setItem("authority", JSON.stringify(res.data));
       });
+    },
+    getMenuList(){
+      this.$http.get("/api/menus").then(res => {
+                  localStorage.setItem("menuList", JSON.stringify(res.data));
+                });
     }
   }
 };

@@ -194,6 +194,7 @@ export default {
               email: this.loginForm.username,
               password: this.loginForm.password
             };
+            localStorage.setItem("roleEmail", data.email);
             this.$http.post("/api/loginByPassword", data).then(
               res => {
                 if (res.data.respCode == "1") {
