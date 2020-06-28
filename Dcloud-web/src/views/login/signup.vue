@@ -183,9 +183,10 @@ export default {
                 this.loading = false;
                 if (res.data.respCode == "1") {
                   //注册成功  角色默认为教师
-                  if (res.data.role == "1") {
+                  localStorage.setItem("roleId", "0");
+                  // if (res.data.role == "1") {
                     localStorage.setItem("roles", "teacher");
-                  }
+                  // }
                   var date = new Date();
                   localStorage.setItem("loginTime", date.getTime()); //注册时间
                   localStorage.setItem("isLogin", true);
