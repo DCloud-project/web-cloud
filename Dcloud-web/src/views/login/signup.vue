@@ -178,7 +178,7 @@ export default {
               email: this.loginForm.username,
               password: this.loginForm.pass
             };
-            this.$http.post("/api/sendCode", data).then(
+            this.$http.post("/api/register", data).then(
               res => {
                 this.loading = false;
                 if (res.data.respCode == "1") {
