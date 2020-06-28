@@ -185,7 +185,7 @@ export default {
                   //注册成功  角色默认为教师
                   localStorage.setItem("roleId", "0");
                   // if (res.data.role == "1") {
-                    localStorage.setItem("roles", "teacher");
+                  localStorage.setItem("roles", "teacher");
                   // }
                   var date = new Date();
                   localStorage.setItem("loginTime", date.getTime()); //注册时间
@@ -194,7 +194,7 @@ export default {
                   localStorage.setItem("account", this.loginForm.username);
                   this.$router.push("/home");
                 } else {
-                   this.loading = false;
+                  this.loading = false;
                   this.$alert(res.data.respCode, "注册失败", {
                     confirmButtonText: "确定"
                   });
