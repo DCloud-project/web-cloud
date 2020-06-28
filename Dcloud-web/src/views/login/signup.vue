@@ -175,7 +175,7 @@ export default {
           } else {
             this.loading = true;
             var data = {
-              email: this.loginForm1.username,
+              email: this.loginForm.username,
               password: this.loginForm.pass
             };
             this.$http.post("/api/sendCode", data).then(

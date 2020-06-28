@@ -12,7 +12,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://269g3h.natappfree.cc', //设置你调用的接口域名和端口号
+                target: 'http://6cebjp.natappfree.cc', //设置你调用的接口域名和端口号
                 changeOrigin: true,
                    //跨域
                 pathRewrite: {

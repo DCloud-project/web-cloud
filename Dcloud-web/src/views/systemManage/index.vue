@@ -18,7 +18,7 @@
           <el-input v-model.number="experienceForm.checkExperience"></el-input>
         </el-form-item>
 
-        <el-form-item
+        <!-- <el-form-item
           label="活动/作业经验值："
           prop="workExperience"
           :rules="[
@@ -27,7 +27,7 @@
     ]"
         >
           <el-input v-model.number="experienceForm.workExperience"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-row>
           <el-col :span="11">
             <el-form-item
