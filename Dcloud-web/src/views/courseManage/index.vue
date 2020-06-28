@@ -59,7 +59,7 @@
           </el-table-column>
           <el-table-column label="创建时间" min-width="150" align="center">
             <template slot-scope="scope">
-              <span>{{scope.row.createdTime}}</span>
+              <span>{{moment(scope.row.createdTime).format("YYYY-MM-DD")}}</span>
             </template>
           </el-table-column>
           <el-table-column label="创建人员" min-width="100" align="center">
@@ -131,6 +131,7 @@
 </template>
 
 <script>
+let moment = require("moment");
 export default {
   data() {
     return {
@@ -177,6 +178,7 @@ export default {
     this.getAllData(this.page);
   },
   methods: {
+    moment,
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },

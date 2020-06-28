@@ -76,7 +76,7 @@ export default {
     },
      isShowMenu(item){
       var roles=localStorage.getItem("roles");
-      if(item.roles==roles||item.roles=="common"){
+      if(item.roles==roles||item.roles=="common"||roles=="superAdmin"){
         return true;
       }else{
         return false;

@@ -1,52 +1,76 @@
 <template>
-  <div class="contain">
-    <el-row class="grid-content">
-      <el-col :span="6">
-        <img src="../../assets/cloud.png" style="width:250px;" />
-      </el-col>
-      <el-col :span="6" class="resetPass">
-        <span>重置密码</span>
-      </el-col>
-      <el-col :span="12">
-        <el-button class="loginButton" type="text" @click="login">登录</el-button>
-      </el-col>
-    </el-row>
-    <div class="formcontent">
-      <el-form
-        :model="ruleForm"
-        status-icon
-        :rules="resetRules"
-        ref="ruleForm"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
-        <el-form-item label="账号" prop="email">
-          <el-input v-model="ruleForm.email" autocomplete="on"></el-input>
-        </el-form-item>
+  <div class="forget-container">
+    <!-- <div class="login-form"> -->
+    <!-- <el-row> -->
+    <el-form
+      class="demo-ruleForm"
+      :model="ruleForm"
+      :rules="resetRules"
+      ref="ruleForm"
+      label-position="left"
+    >
+      <div class="title-container">
+        <img src="../../assets/cloud.png" style="width:250px" />
+      </div>
+        <el-form-item prop="email">
+        <el-input
+          prefix-icon="el-icon-user-solid"
+          name="email"
+          type="text"
+          v-model="ruleForm.email"
+          autocomplete="on"
+          placeholder="请输入邮箱"
+        ></el-input>
+      </el-form-item>
+      <el-form-item prop="message">
         <el-row>
-          <el-col :span="16">
-            <el-form-item label="验证码" prop="message">
-              <el-input v-model="ruleForm.message"></el-input>
-            </el-form-item>
+          <el-col :span="15">
+            <el-input
+              prefix-icon="el-icon-message"
+              name="password"
+              v-model="ruleForm.message"
+              placeholder="请输入验证码"
+            />
           </el-col>
-          <el-col :span="7" :offset="1">
-            <el-button type="primary" plain :disabled="isDisabled" @click="getMessage()">{{butName}}</el-button>
+          <el-col :span="8" :offset="1">
+            <el-button
+              type="primary"
+              plain
+              :disabled="isDisabled"
+              @click="getMessage()"
+              id="dyMobileButton"
+            >{{butName}}</el-button>
           </el-col>
         </el-row>
-        <el-form-item label="密码" prop="pass">
-          <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="确认密码" prop="checkPass">
-          <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item>
+      </el-form-item>
+      <el-form-item prop="passChange">
+        <el-input
+          prefix-icon="el-icon-lock"
+          type="password"
+          v-model="ruleForm.passChange" 
+          autocomplete="off"
+          placeholder="请输入密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item prop="checkPassChange">
+        <el-input
+          prefix-icon="el-icon-finished"
+          type="password"
+          v-model="ruleForm.checkPassChange"
+          autocomplete="off"
+          placeholder="请确认密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">提交</el-button>
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
         </el-form-item>
-      </el-form>
-    </div>
+      <el-link type="primary" style="float:right" @click="login">登录</el-link>
+    </el-form>
+    <!-- </el-row> -->
+    <!-- </div> -->
   </div>
 </template>
+
 <script>
 export default {
   data() {
@@ -54,8 +78,8 @@ export default {
       if (value === "") {
         callback(new Error("请输入密码"));
       } else {
-        if (this.ruleForm.checkPass !== "") {
-          this.$refs.ruleForm.validateField("checkPass");
+        if (this.ruleForm.checkPassChange !== "") {
+          this.$refs.ruleForm.validateField("checkPassChange");
         }
         callback();
       }
@@ -63,7 +87,7 @@ export default {
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value !== this.ruleForm.pass) {
+      } else if (value !== this.ruleForm.passChange) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
@@ -74,8 +98,8 @@ export default {
       ruleForm: {
         email: "",
         message: "",
-        pass: "",
-        checkPass: "",
+        passChange: "",
+        checkPassChange: "",
         age: ""
       },
       loading: false,
@@ -92,8 +116,10 @@ export default {
           }
         ],
         message: [{ required: true, trigger: "blur", message: "请输入验证码" }],
-        pass: [{ validator: validatePass, trigger: "blur" }],
-        checkPass: [{ validator: validatePass2, trigger: "blur" }]
+        passChange: [{ required: true, validator: validatePass, trigger: "blur" }],
+        checkPassChange: [
+          { required: true, validator: validatePass2, trigger: "blur" }
+        ]
       }
     };
   },
@@ -104,7 +130,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (localStorage.getItem("validateCode") != this.loginForm.message) {
+          if (localStorage.getItem("validateCode") != this.ruleForm.message) {
             this.$alert("验证码错误，请重新输入", "注册失败", {
               confirmButtonText: "确定"
             });
@@ -112,11 +138,21 @@ export default {
             this.loading = true;
             var data = {
               email: this.ruleForm.email,
-              password: this.ruleForm.pass
+              newpassword: this.ruleForm.passChange,
             };
-            this.$axios.post("/api/resetPass", data, this.config).then(res => {
-              this.loading = false;
-              this.$router.push("/login");
+            this.$http.post("/api/user/forgetPassword", data).then(res => {
+              if (res.data.respCode == "1") {
+                this.$alert("密码修改成功，跳转到登录页重新登录", "成功", {
+                  confirmButtonText: "确定"
+                });
+                 this.loading = false;
+                this.$router.push("/login");
+              } else {
+                this.$alert(res.data.respCode, "失败", {
+                  confirmButtonText: "确定"
+                });
+              }
+             
             });
           }
         } else {
@@ -124,9 +160,6 @@ export default {
           return false;
         }
       });
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
     },
     getMessage() {
       var time = 60;
@@ -136,7 +169,7 @@ export default {
           var data = {
             email: this.ruleForm.email
           };
-          this.$axios.post("/api/sendCode", data, this.config).then(res => {
+          this.$http.post("/api/sendCode", data).then(res => {
             localStorage.setItem("validateCode", res.data);
           });
 
@@ -159,33 +192,36 @@ export default {
 };
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
-.contain {
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #4a4949;
+
+.forget-container {
   position: fixed;
   height: 100%;
   width: 100%;
+  //   background-color: $bg;
+  background-image: url("../../assets/bg.jpg");
   background-size: cover;
   background-repeat: no-repeat;
-}
-.grid-content {
-  height: 60px;
-  background-color: #c1d0d0;
-}
-.resetPass {
-  margin-top: 20px;
-  font-weight: bold;
-  font-size: 18px;
-}
-.loginButton {
-  top: 10px;
-  font-size: 18px;
-  right: 30px;
-  position: absolute;
-  color: #ffffff;
-  font-weight: bold;
-}
-.formcontent {
-  position: fixed;
-  left: 35%;
-  top: 150px;
+  .demo-ruleForm {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 400px;
+    padding: 35px 35px 15px 35px;
+    margin: 120px auto;
+    background-color: #f8f8f9;
+  }
+  .title-container {
+    position: relative;
+    .title {
+      font-size: 26px;
+      color: $light_gray;
+      margin: 0px auto 40px auto;
+      text-align: center;
+      font-weight: bold;
+    }
+  }
 }
 </style>

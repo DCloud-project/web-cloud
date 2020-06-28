@@ -14,6 +14,8 @@ import axios from 'axios'
 import VueResource from 'vue-resource'
 import authority from '@/store/authority'
 import menuList from '@/store/menuList'
+import moment from 'moment' 
+Vue.prototype.$moment = moment
 Vue.prototype.authority = authority
 Vue.prototype.menuList = menuList
 Vue.use(VueResource)

@@ -403,6 +403,7 @@ export default {
       if (auth) {
         this.list = [];
         this.listLoading = true;
+        var roleId = localStorage.getItem("roleId");
         if (this.formInline.username == "" && this.formInline.state == "") {
           this.showUserInfo(this.page);
         } else {
@@ -414,7 +415,9 @@ export default {
                 "&state=" +
                 this.formInline.state +
                 "&name=" +
-                this.formInline.username
+                this.formInline.username +
+                "&roleId=" +
+                roleId
             )
             .then(
               res => {
@@ -446,21 +449,24 @@ export default {
       var data = {
         page: this.page
       };
-      this.$http.get("/api/user?page=" + this.page + "&state=&name=").then(
-        res => {
-          this.listLoading = false;
-          this.totalNum = res.data[0].totalCount;
-          if (this.totalNum != 0) {
-            delete res.data[0];
-            this.list = res.data;
+      var roleId = localStorage.getItem("roleId");
+      this.$http
+        .get("/api/user?page=" + this.page + "&state=&name=&roleId=" + roleId)
+        .then(
+          res => {
+            this.listLoading = false;
+            this.totalNum = res.data[0].totalCount;
+            if (this.totalNum != 0) {
+              delete res.data[0];
+              this.list = res.data;
+            }
+          },
+          res => {
+            this.$router.push({
+              path: "/" + res
+            });
           }
-        },
-        res => {
-          this.$router.push({
-            path: "/" + res
-          });
-        }
-      );
+        );
     },
     reset() {
       this.ruleForm.name = "";
