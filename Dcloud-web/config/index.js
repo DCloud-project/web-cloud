@@ -9,11 +9,11 @@ module.exports = {
 
         // Paths
         assetsSubDirectory: 'static',
-        assetsPublicPath: './',
-        // assetsPublicPath: '/',
+        // assetsPublicPath: './',
+        assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://ac2kte.natappfree.cc', //设置你调用的接口域名和端口号
+                target: 'http://39.97.108.239:8080', //设置你调用的接口域名和端口号
                 changeOrigin: true,
                    //跨域
                 pathRewrite: {
@@ -66,7 +66,16 @@ module.exports = {
         // Paths
         assetsRoot: path.resolve(__dirname, '../dist'),
         assetsSubDirectory: 'static',
-
+        proxyTable: {
+            '/api': {
+                target: 'http://39.97.108.239:8080', //设置你调用的接口域名和端口号
+                changeOrigin: true,
+                   //跨域
+                pathRewrite: {
+                    '^/api': '/'     //这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://10.1.5.11:8080/xxx/duty?time=2017-07-07 14:57:22'，直接写‘/api/xxx/duty?time=2017-07-07 14:57:22’即可
+                }
+            }
+        },
         /**
          * You can set by youself according to actual condition
          * You will need to set this if you plan to deploy your site under a sub path,
