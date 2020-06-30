@@ -364,12 +364,14 @@ export default {
               if (res.data.respCode == "1") {
                 this.$alert("删除成功", "成功", {
                   confirmButtonText: "确定"
+                }).then(() => {
+                  this.listLoading = true;
+                  this.$http.get("/api/menus").then(res => {
+                    localStorage.setItem("menuList", JSON.stringify(res.data));
+                  });
+                  location.reload();
+                  this.showUserInfo(this.page);
                 });
-                this.$http.get("/api/menus").then(res => {
-                  localStorage.setItem("menuList", JSON.stringify(res.data));
-                });
-                location.reload();
-                this.showUserInfo(this.page);
               }
             });
           })
@@ -411,12 +413,17 @@ export default {
                 if (res.data.respCode == "1") {
                   this.$alert("删除成功", "成功", {
                     confirmButtonText: "确定"
+                  }).then(() => {
+                    this.listLoading = true;
+                    this.$http.get("/api/menus").then(res => {
+                      localStorage.setItem(
+                        "menuList",
+                        JSON.stringify(res.data)
+                      );
+                    });
+                    location.reload();
+                    this.showUserInfo(this.page);
                   });
-                  this.$http.get("/api/menus").then(res => {
-                    localStorage.setItem("menuList", JSON.stringify(res.data));
-                  });
-                  location.reload();
-                  this.showUserInfo(this.page);
                 }
               });
             })
@@ -498,7 +505,7 @@ export default {
             return val;
           }
           this.list = toTree(data);
-          console.log(this.list);
+          // console.log(this.list);
           // for (var i = 0; i < this.list.length; i++) {
           //   this.list[i].parentId = this.parentFind(this.list[i].parentId);
           // }
@@ -564,12 +571,14 @@ export default {
               if (res.data.respCode == "1") {
                 this.$alert("菜单新增成功", "成功", {
                   confirmButtonText: "确定"
+                }).then(() => {
+                  this.listLoading = true;
+                  this.$http.get("/api/menus").then(res => {
+                    localStorage.setItem("menuList", JSON.stringify(res.data));
+                  });
+                  location.reload();
+                  this.showUserInfo(this.page);
                 });
-                this.$http.get("/api/menus").then(res => {
-                  localStorage.setItem("menuList", JSON.stringify(res.data));
-                });
-                location.reload();
-                this.showUserInfo(this.page);
               } else {
                 this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
@@ -583,12 +592,14 @@ export default {
               if (res.data.respCode == "1") {
                 this.$alert("菜单修改成功", "成功", {
                   confirmButtonText: "确定"
+                }).then(() => {
+                  this.listLoading = true;
+                  this.$http.get("/api/menus").then(res => {
+                    localStorage.setItem("menuList", JSON.stringify(res.data));
+                  });
+                  location.reload();
+                  this.showUserInfo(this.page);
                 });
-                this.$http.get("/api/menus").then(res => {
-                  localStorage.setItem("menuList", JSON.stringify(res.data));
-                });
-                location.reload();
-                this.showUserInfo(this.page);
               } else {
                 this.$alert("菜单修改失败", "失败", {
                   confirmButtonText: "确定"
@@ -602,8 +613,6 @@ export default {
     },
     resetForm(formName) {
       this.dialogFormVisible = false;
-      this.$refs[formName].resetFields();
-      // this.reset();
     },
     handleCurrentChange(val) {
       this.page = val;
