@@ -19,6 +19,7 @@
 </template>
 <script>
 export default {
+  inject: ["reload"], // 使用 inject 注入 reload 变量
   data() {
     return {
       tableData: [
@@ -45,9 +46,23 @@ export default {
       ]
     };
   },
+  beforeRouteEnter(to, from, next) {
+    // 在当前路由改变，路由参数发生变化，组件被复用时调用
+    // 里面写获取刷新数据的方法
+    next();
+  },
+  beforeRouteUpdate(to, from, next) {
+    next();
+  },
   created() {
     this.showAuthorityList();
-    this.getMenuList
+    this.getMenuList();
+    // console.log(localStorage.getItem("menuList"))
+    // if(localStorage.getItem("isUpdate")==null||localStorage.getItem("isUpdate")==undefined){
+    //   localStorage.setItem("isUpdate",1);
+    //   this.reload();
+    //   // location.reload();
+    // }
   },
   methods: {
     showAuthorityList() {
@@ -56,10 +71,10 @@ export default {
         localStorage.setItem("authority", JSON.stringify(res.data));
       });
     },
-    getMenuList(){
+    getMenuList() {
       this.$http.get("/api/menus").then(res => {
-                  localStorage.setItem("menuList", JSON.stringify(res.data));
-                });
+        localStorage.setItem("menuList", JSON.stringify(res.data));
+      });
     }
   }
 };

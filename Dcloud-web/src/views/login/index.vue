@@ -111,6 +111,7 @@
 <script>
 import qs from "qs";
 export default {
+   inject:['reload'], // 使用 inject 注入 reload 变量 
   data() {
     return {
       loginForm: {
@@ -217,6 +218,7 @@ export default {
                   localStorage.setItem("isLogin", true);
                   this.$http.get("/api/menus").then(res => {
                     localStorage.setItem("menuList", JSON.stringify(res.data));
+                    // location.reload();
                   });
                   this.$router.push("/home");
                 } else {
@@ -274,9 +276,11 @@ export default {
                         "menuList",
                         JSON.stringify(res.data)
                       );
-                      console.log(res.data);
+                      this.$router.push("/home");
+                     
+                      // console.log(res.data);
                     });
-                    this.$router.push("/home");
+                    
                   } else {
                     this.loading = false;
                     this.$alert(res.data.respCode, "登录失败", {

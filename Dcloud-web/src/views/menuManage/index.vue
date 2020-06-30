@@ -603,7 +603,7 @@ export default {
     resetForm(formName) {
       this.dialogFormVisible = false;
       this.$refs[formName].resetFields();
-      this.reset();
+      // this.reset();
     },
     handleCurrentChange(val) {
       this.page = val;

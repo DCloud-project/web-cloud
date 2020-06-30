@@ -254,6 +254,7 @@ router.beforeEach((to, from, next) => {
         // 拿到数据后 就是把数据push到父组件里  
         //  util.extendRouters 自己写的方法 
         routerGo();
+
         next(to.path);
     }
     var isLogin = JSON.parse(localStorage.getItem('isLogin')); //获取缓存看是否登录过
@@ -280,6 +281,64 @@ router.beforeEach((to, from, next) => {
 });
 
 function routerGo() {
+    var data = [{
+            icon: "el-icon-set-up",
+            name: "角色管理",
+            roles: "superAdmin",
+            url: "/roleManage",
+            children: [{
+                name: "权限分配",
+                url: "/permissionAssignment"
+            }, {
+                name: "角色分配",
+                url: ""
+            }]
+        },
+        {
+            icon: "el-icon-user-solid",
+            name: "用户管理",
+            roles: "admin",
+            url: "/userManage"
+        },
+        {
+            icon: "el-icon-menu",
+            name: "菜单管理",
+            roles: "superAdmin",
+            url: "/menuManage"
+        },
+        {
+            icon: "el-icon-reading",
+            name: "数据字典",
+            roles: "superAdmin",
+            url: "/dataDictionary",
+            children: [{
+                name: "数据字典管理",
+                url: "/addDictionary"
+            }]
+        },
+        {
+            icon: "el-icon-folder-opened",
+            name: "系统管理",
+            roles: "common",
+            url: "/systemManage"
+        },
+        {
+            icon: "el-icon-s-flag",
+            name: "学校管理",
+            roles: "common",
+            url: "/schoolManage",
+        },
+        {
+            icon: "el-icon-school",
+            name: "班课管理",
+            roles: "common",
+            url: "/courseManage",
+        }
+    ]
+    if (localStorage.getItem('menuList') == null || localStorage.getItem('menuList') == undefined) {
+        localStorage.setItem("menuList", JSON.stringify(data));
+        console.log("666")
+    }
     var menuList = JSON.parse(localStorage.getItem('menuList'));
     if (menuList != null) {
         for (var i = 0; i < menuList.length; i++) {
@@ -329,6 +388,7 @@ function routerGo() {
     }
     router.addRoutes(router.options.routes)
 }
+
 
 // export default new Router({
 //     scrollBehavior: () => ({ y: 0 }),
