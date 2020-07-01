@@ -111,7 +111,7 @@
 <script>
 import qs from "qs";
 export default {
-   inject:['reload'], // 使用 inject 注入 reload 变量 
+  inject: ["reload"], // 使用 inject 注入 reload 变量
   data() {
     return {
       loginForm: {
@@ -127,7 +127,14 @@ export default {
         password: [{ required: true, trigger: "blur", message: "请输入密码" }]
       },
       loginRules1: {
-        username: [{ required: true, trigger: "blur", message: "请输入邮箱" }],
+        username: [
+          { required: true, trigger: "blur", message: "请输入邮箱" },
+          {
+            type: "email",
+            message: "请输入正确的邮箱地址",
+            trigger: ["blur", "change"]
+          }
+        ],
         message: [{ required: true, trigger: "blur", message: "请输入验证码" }]
       },
       passwordType: "password",
@@ -149,7 +156,13 @@ export default {
           };
           this.$http.post("/api/sendCode", data).then(
             res => {
-              localStorage.setItem("validateCode", res.data);
+                if (res.data.respCode == "请输入真实邮箱") {
+                this.$alert("请输入真实邮箱!", "失败", {
+                  confirmButtonText: "确定"
+                });
+              } else {
+              localStorage.setItem("validateCode", res.data.respCode);
+              }
             },
             res => {
               this.$router.push({
@@ -199,28 +212,42 @@ export default {
             this.$http.post("/api/loginByPassword", data).then(
               res => {
                 if (res.data.respCode == "1") {
-                  //登录成功
-                  localStorage.setItem("roleId", res.data.role);
-                  if (res.data.role == "0") {
-                    //登录角色
-                    localStorage.setItem("roles", "teacher");
-                  } else if (res.data.role == "1") {
-                    localStorage.setItem("roles", "admin");
-                  } else if (res.data.role == "2") {
-                    localStorage.setItem("roles", "superAdmin");
-                  }
-
-                  var date = new Date();
-                  localStorage.setItem("loginTime", date.getTime()); //登录时间
                   this.loading = false;
-                  localStorage.setItem("Authorization", res.data.token);
-                  localStorage.setItem("account", this.loginForm.username);
-                  localStorage.setItem("isLogin", true);
-                  this.$http.get("/api/menus").then(res => {
-                    localStorage.setItem("menuList", JSON.stringify(res.data));
-                    // location.reload();
-                  });
-                  this.$router.push("/home");
+                  //登录成功
+                  if (res.data.role != "3") {
+                    localStorage.setItem("roleId", res.data.role);
+                    if (res.data.role == "0") {
+                      //登录角色
+                      localStorage.setItem("roles", "teacher");
+                    } else if (res.data.role == "1") {
+                      localStorage.setItem("roles", "admin");
+                    } else if (res.data.role == "2") {
+                      localStorage.setItem("roles", "superAdmin");
+                    }
+
+                    var date = new Date();
+                    localStorage.setItem("loginTime", date.getTime()); //登录时间
+                    localStorage.setItem("Authorization", res.data.token);
+                    localStorage.setItem("account", this.loginForm.username);
+                    localStorage.setItem("isLogin", true);
+                    this.$http.get("/api/menus").then(res => {
+                      localStorage.setItem(
+                        "menuList",
+                        JSON.stringify(res.data)
+                      );
+                      // location.reload();
+                    });
+                    this.$router.push("/home");
+                  } else {
+                    //学生
+                    this.$alert(
+                      "该账号为学生账号，没有权限登录后台管理系统，如有疑问请联系管理员！",
+                      "提示",
+                      {
+                        confirmButtonText: "确定"
+                      }
+                    );
+                  }
                 } else {
                   this.loading = false;
                   this.$alert(res.data.respCode, "登录失败", {
@@ -256,31 +283,39 @@ export default {
                   this.loading = false;
                   if (res.data.respCode == "1") {
                     //登录成功
-                    localStorage.setItem("roleId", res.data.role);
-                    if (res.data.role == "0") {
-                      //登录角色
-                      localStorage.setItem("roles", "teacher");
-                    } else if (res.data.role == "1") {
-                      localStorage.setItem("roles", "admin");
-                    } else if (res.data.role == "2") {
-                      localStorage.setItem("roles", "superAdmin");
-                    }
-                    var date = new Date();
-                    localStorage.setItem("loginTime", date.getTime()); //登录时间
-                    this.loading = false;
-                    localStorage.setItem("Authorization", res.data.token);
-                    localStorage.setItem("account", this.loginForm.username);
-                    localStorage.setItem("isLogin", true);
-                    this.$http.get("/api/menus").then(res => {
-                      localStorage.setItem(
-                        "menuList",
-                        JSON.stringify(res.data)
+                    if (res.data.role != "3") {
+                      localStorage.setItem("roleId", res.data.role);
+                      if (res.data.role == "0") {
+                        //登录角色
+                        localStorage.setItem("roles", "teacher");
+                      } else if (res.data.role == "1") {
+                        localStorage.setItem("roles", "admin");
+                      } else if (res.data.role == "2") {
+                        localStorage.setItem("roles", "superAdmin");
+                      }
+                      var date = new Date();
+                      localStorage.setItem("loginTime", date.getTime()); //登录时间
+                      this.loading = false;
+                      localStorage.setItem("Authorization", res.data.token);
+                      localStorage.setItem("account", this.loginForm.username);
+                      localStorage.setItem("isLogin", true);
+                      this.$http.get("/api/menus").then(res => {
+                        localStorage.setItem(
+                          "menuList",
+                          JSON.stringify(res.data)
+                        );
+                        this.$router.push("/home");
+                      });
+                    } else {
+                      //学生
+                      this.$alert(
+                        "该账号为学生账号，没有权限登录后台管理系统，如有疑问请联系管理员！",
+                        "提示",
+                        {
+                          confirmButtonText: "确定"
+                        }
                       );
-                      this.$router.push("/home");
-                     
-                      // console.log(res.data);
-                    });
-                    
+                    }
                   } else {
                     this.loading = false;
                     this.$alert(res.data.respCode, "登录失败", {

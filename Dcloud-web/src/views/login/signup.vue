@@ -139,13 +139,20 @@ export default {
           };
           this.$http.post("/api/sendCode", data).then(
             res => {
-              localStorage.setItem("validateCode", res.data);
+                if (res.data.respCode == "请输入真实邮箱") {
+                this.$alert("请输入真实邮箱!", "失败", {
+                  confirmButtonText: "确定"
+                });
+              } else {
+              localStorage.setItem("validateCode", res.data.respCode);
+              }
             },
             res => {
-              this.$router.push({
-                path: "/" + res
-              });
-            }
+                this.$router.push({
+                  path: "/" + res
+                });
+              }
+            
           );
 
           //倒计时

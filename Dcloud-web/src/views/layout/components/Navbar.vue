@@ -1,9 +1,9 @@
 <template>
   <el-menu class="navbar" mode="horizontal">
     <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
-    <breadcrumb></breadcrumb>
-    <!-- <h1>到云后台管理系统</h1> -->
-    <img src="../../../assets/title.png" class="title-image" />
+    <breadcrumb style="float:left"></breadcrumb>
+    <p class="title-image">到云后台管理系统</p>
+    <!-- <img src="../../../assets/title.png" class="title-image" /> -->
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
         <img class="user-avatar" src="../../../assets/userImg.jpg" />
@@ -90,10 +90,12 @@ export default {
     }
   }
   .title-image {
-    margin-top: -30px;
+    margin-top: 0px;
     right: 37%;
     position: absolute;
-    height: 100px;
+    font-size: 35px;
+    font-family: cursive;
+    // height: 100px;
   }
 }
 </style>

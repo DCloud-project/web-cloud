@@ -7,7 +7,7 @@
         <h3>产品简介</h3>
         <div
           class="des"
-        >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;到云是一款免费课堂互动教学 App。它基于移动互联环境，实现老师与学生之间的即时互动、资源推送和作业任务布置，完善的激励与评价体系激发学生在移动设备上的自主学习兴趣，完整的学习行为记录实现对学生学习的过程性考核，更能为老师提供高质量的教学研究大数据，并实现个性化教学和助教功能。</div>
+        >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;到云是一款免费课堂互动教学 App。它基于移动互联环境，实现老师与学生之间的即时互动、签到，完善的激励与评价体系激发学生在移动设备上的自主学习兴趣，完整的学习行为记录实现对学生学习的过程性考核，更能为老师提供高质量的教学研究大数据，并实现个性化教学和助教功能。</div>
         <h3>开发人员</h3>
         <el-table :data="tableData" style="width: 100%;" border>
           <el-table-column prop="name" label="成员" min-width="180" align="center"></el-table-column>
