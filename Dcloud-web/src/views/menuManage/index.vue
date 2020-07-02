@@ -261,7 +261,7 @@ export default {
     }
   },
   created() {
-    this.showUserInfo(this.page);
+    this.showMenuData(this.page);
   },
   methods: {
     reset() {
@@ -370,7 +370,7 @@ export default {
                     localStorage.setItem("menuList", JSON.stringify(res.data));
                   });
                   location.reload();
-                  this.showUserInfo(this.page);
+                  this.showMenuData(this.page);
                 });
               }
             });
@@ -422,7 +422,7 @@ export default {
                       );
                     });
                     location.reload();
-                    this.showUserInfo(this.page);
+                    this.showMenuData(this.page);
                   });
                 }
               });
@@ -469,7 +469,7 @@ export default {
         });
       }
     },
-    showUserInfo(page) {
+    showMenuData(page) {
       this.list = [];
       this.listLoading = true;
       this.page = page;
@@ -577,13 +577,13 @@ export default {
                     localStorage.setItem("menuList", JSON.stringify(res.data));
                   });
                   location.reload();
-                  this.showUserInfo(this.page);
+                  this.showMenuData(this.page);
                 });
               } else {
                 this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
                 });
-                this.showUserInfo(this.page);
+                this.showMenuData(this.page);
               }
               this.$refs[formName].resetFields();
             });
@@ -598,13 +598,13 @@ export default {
                     localStorage.setItem("menuList", JSON.stringify(res.data));
                   });
                   location.reload();
-                  this.showUserInfo(this.page);
+                  this.showMenuData(this.page);
                 });
               } else {
                 this.$alert("菜单修改失败", "失败", {
                   confirmButtonText: "确定"
                 });
-                this.showUserInfo(this.page);
+                this.showMenuData(this.page);
               }
             });
           }
@@ -613,15 +613,18 @@ export default {
     },
     resetForm(formName) {
       this.dialogFormVisible = false;
+      this.$refs[formName].resetFields();
+      this.reset();
+       this.showMenuData(this.page);
     },
     handleCurrentChange(val) {
       this.page = val;
-      this.showUserInfo(this.page);
+      this.showMenuData(this.page);
     },
     resetData() {
       (this.formInline.menus = ""),
         (this.formInline.state = ""),
-        this.showUserInfo(this.page);
+        this.showMenuData(this.page);
     }
   }
 };
