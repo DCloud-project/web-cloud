@@ -308,6 +308,7 @@ export default {
       this.dialogFormVisible = false;
       this.$refs[formName].resetFields();
       this.reset();
+       this.showRoleInfo(this.page);
     },
     showRoleInfo(page) {
       this.list = [];
