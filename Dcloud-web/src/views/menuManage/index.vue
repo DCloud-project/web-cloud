@@ -327,10 +327,40 @@ export default {
             this.listLoading = false;
             this.totalNum = res.data.total;
             if (this.totalNum != 0) {
-              this.list = res.data.records;
-              for (var i = 0; i < this.list.length; i++) {
-                this.list[i].parentId = this.parentFind(this.list[i].parentId);
+          this.list = res.data.records;
+          var data = res.data.records;
+               function toTree(data) {
+            data.forEach(function(item) {
+              delete item.children;
+            });
+            var map = {};
+            data.forEach(function(item) {
+              map[item.id] = item;
+            });
+            // console.log(map);
+            var val = [];
+            data.forEach(function(item) {
+              var parent = map[item.parentId];
+              if (parent) {
+                (parent.children || (parent.children = [])).push(item);
+              } else {
+                val.push(item);
               }
+            });
+            return val;
+          }
+          this.list = toTree(data);
+          for (var i = 0; i < this.list.length; i++) {
+            if (this.list[i].parentId == 0) {
+              this.list[i].parentId = "无";
+            }
+            if (this.list[i].children != null) {
+              for (var j = 0; j < this.list[i].children.length; j++) {
+                this.list[i].children[j].parentId = this.list[i].name;
+              }
+            }
+          }
+          console.log(this.list)
             }
           });
       } else {
@@ -483,6 +513,7 @@ export default {
       this.$http.get("/api/menus?page=" + page).then(res => {
         this.listLoading = false;
         this.totalNum = res.data.total;
+        console.log(res.data)
         if (this.totalNum != 0) {
           delete res.data[0];
           this.list = res.data.records;
@@ -508,11 +539,6 @@ export default {
             return val;
           }
           this.list = toTree(data);
-          // console.log(this.list);
-          // for (var i = 0; i < this.list.length; i++) {
-          //   this.list[i].parentId = this.parentFind(this.list[i].parentId);
-          // }
-          // console.log(this.list);
           for (var i = 0; i < this.list.length; i++) {
             if (this.list[i].parentId == 0) {
               this.list[i].parentId = "无";
