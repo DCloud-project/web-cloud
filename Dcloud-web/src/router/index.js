@@ -8,8 +8,8 @@ import Layout from '../views/layout/Layout'
 // export const constantRouterMap = [
 const router = new Router({
     base: '/',
-    // mode: 'history', //去除#
-    mode: 'hash',
+    mode: 'history', //去除#
+    // mode: 'hash',
     routes: [
         { path: '/', redirect: '/login', hidden: true },
         {
