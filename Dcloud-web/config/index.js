@@ -9,8 +9,8 @@ module.exports = {
 
         // Paths
         assetsSubDirectory: 'static',
-        assetsPublicPath: './',
-        // assetsPublicPath: '/',
+        // assetsPublicPath: './',
+        assetsPublicPath: '/',
         proxyTable: {
             '/api': {
                 target: 'http://39.97.108.239:8080', //设置你调用的接口域名和端口号
@@ -23,8 +23,8 @@ module.exports = {
         },
 
         // Various Dev Server settings
-        // host: 'localhost', // can be overwritten by process.env.HOST
-        host: '0.0.0.0',
+        host: 'localhost', // can be overwritten by process.env.HOST
+        // host: '0.0.0.0',
         port: 8081, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
         autoOpenBrowser: true,
         errorOverlay: true,

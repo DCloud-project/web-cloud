@@ -28,7 +28,7 @@
             type="text"
             v-model="loginForm.username"
             autocomplete="on"
-            placeholder="请输入邮箱或账号"
+            placeholder="请输入邮箱/昵称/手机号"
           ></el-input>
         </el-form-item>
 
@@ -104,6 +104,8 @@
         >登录</el-button>
         <el-link type="primary" style="float:right" @click="signup">注册</el-link>
       </el-form>
+       <!-- <el-divider>第三方登录</el-divider>
+        <img src="../../assets/qq.png" style="width:25px;height:25px;position:relative;left:45%" @click="loginByThird()"/> -->
     </div>
   </div>
 </template>
@@ -144,8 +146,39 @@ export default {
       isDisabled: false
     };
   },
+  created(){
+    this.confirmAutoLogin();
+  },
   methods: {
     handleClick(tab, event) {},
+    loginByThird(){//第三方登录
+      this.$http.get("/api/getQQCode").then(
+            res => {
+              
+              window.open(res.data.url)
+             
+            },
+            res => {
+              this.$router.push({
+                path: "/" + res
+              });
+            })
+    },
+    confirmAutoLogin() {
+      var isLogin = JSON.parse(localStorage.getItem("isLogin")); //获取缓存看是否登录过
+      var time = localStorage.getItem("loginTime");
+      var nowTime = new Date().getTime();
+      let token = localStorage.getItem("Authorization");
+      if (
+        isLogin === true &&
+        nowTime <= time + 2592000000 &&
+        token != null &&
+        token != ""
+      ) {
+        //登录过来直接进去，30天内登录不需要重新登录
+        this.$router.push("/home");
+      }
+    },
     getMessage() {
       var time = 60;
       this.$refs.loginForm1.validateField("username", errMsg => {
@@ -156,12 +189,12 @@ export default {
           };
           this.$http.post("/api/sendCode", data).then(
             res => {
-                if (res.data.respCode == "请输入真实邮箱") {
+              if (res.data.respCode == "请输入真实邮箱") {
                 this.$alert("请输入真实邮箱!", "失败", {
                   confirmButtonText: "确定"
                 });
               } else {
-              localStorage.setItem("validateCode", res.data.respCode);
+                localStorage.setItem("validateCode", res.data.respCode);
               }
             },
             res => {
@@ -228,7 +261,7 @@ export default {
                     var date = new Date();
                     localStorage.setItem("loginTime", date.getTime()); //登录时间
                     localStorage.setItem("Authorization", res.data.token);
-                    localStorage.setItem("account", this.loginForm.username);
+                    localStorage.setItem("account", res.data.email);
                     localStorage.setItem("isLogin", true);
                     this.$http.get("/api/menus").then(res => {
                       localStorage.setItem(
@@ -297,7 +330,7 @@ export default {
                       localStorage.setItem("loginTime", date.getTime()); //登录时间
                       this.loading = false;
                       localStorage.setItem("Authorization", res.data.token);
-                      localStorage.setItem("account", this.loginForm.username);
+                      localStorage.setItem("account", res.data.email);
                       localStorage.setItem("isLogin", true);
                       this.$http.get("/api/menus").then(res => {
                         localStorage.setItem(

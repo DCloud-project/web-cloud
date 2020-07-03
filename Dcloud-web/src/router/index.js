@@ -85,160 +85,6 @@ const router = new Router({
 
             }]
         },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/roleManage',
-        //     name: 'roleManage',
-        //     roles: "superAdmin",
-        //     children: [{
-        //         path: 'roleManage',
-        //         component: () =>
-        //             import ('@/views/roleManage/index'),
-        //         name: 'roleManage',
-        //         meta: { title: '角色管理', icon: 'nested' },
-        //     }]
-        // },
-        // {
-        //     path: '/roleManage',
-        //     component: Layout,
-        //     name: 'roleManage1',
-        //     isShow: false,
-        //     meta: {
-        //         title: '角色管理'
-        //     },
-        //     roles: "superAdmin",
-        //     children: [{
-        //         path: 'permissionAssignment',
-        //         component: () =>
-        //             import ('@/views/roleManage/permissionAssignment'),
-        //         name: 'permissionAssignment',
-        //         meta: { title: '权限分配', bread: true },
-        //     }]
-        // },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/userManage',
-        //     name: 'User',
-        //     roles: "superAdmin",
-        //     bread: true,
-        //     children: [{
-        //             path: 'userManage',
-        //             name: 'userManage',
-        //             component: () =>
-        //                 import ('@/views/userManage/index'),
-        //             meta: { title: '用户管理', icon: 'user' }
-        //         },
-
-        //     ]
-        // },
-        // {
-        //     path: '/userManage',
-        //     component: Layout,
-        //     name: 'userManage1',
-        //     isShow: false,
-        //     meta: {
-        //         title: '用户管理'
-        //     },
-        //     roles: "superAdmin",
-        //     children: [{
-        //         path: 'permissionAssignment',
-        //         component: () =>
-        //             import ('@/views/userManage/permissionAssignment'),
-        //         name: 'permissionAssignment',
-        //         meta: { title: '权限分配', bread: true },
-        //     }]
-        // },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/menuManage',
-        //     name: 'menuManage',
-        //     roles: "superAdmin",
-        //     bread: true,
-        //     children: [{
-        //             path: 'menuManage',
-        //             name: 'menuManage',
-        //             component: () =>
-        //                 import ('@/views/menuManage/index'),
-        //             meta: { title: '菜单管理', icon: 'component' }
-        //         },
-
-        //     ]
-        // },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/dataDictionary',
-        //     name: 'dataDictionary',
-        //     roles: "superAdmin",
-        //     bread: true,
-        //     children: [{
-        //             path: 'dataDictionary',
-        //             name: 'dataDictionary',
-        //             component: () =>
-        //                 import ('@/views/dataDictionary/dictionaryList'),
-        //             meta: { title: '数据字典', icon: 'tree' }
-        //         },
-
-        //     ]
-        // },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/dataDictionary',
-        //     name: 'dataDictionary1',
-        //     isShow: false,
-        //     bread: true,
-        //     meta: {
-        //         title: '数据字典'
-        //     },
-        //     children: [{
-        //         path: 'dataDictionary/addDictionary',
-        //         component: () =>
-        //             import ('@/views/dataDictionary/addDictionary'),
-        //         name: 'addDictionary',
-        //         meta: { title: '数据字典管理', icon: 'dashboard', noCache: false },
-
-        //     }]
-        // },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/systemManage',
-        //     name: 'systemManage',
-        //     roles: "common",
-        //     bread: true,
-        //     children: [{
-        //             path: 'systemManage',
-        //             name: 'systemManage',
-        //             component: () =>
-        //                 import ('@/views/systemManage/index'),
-        //             meta: { title: '系统管理', icon: 'product' }
-        //         },
-
-        //     ]
-        // },
-        // {
-        //     path: '/',
-        //     component: Layout,
-        //     redirect: '/schoolManage',
-        //     name: 'schoolManage',
-        //     roles: "common",
-        //     bread: true,
-        //     children: [{
-        //             path: 'schoolManage',
-        //             name: 'schoolManage',
-        //             component: () =>
-        //                 import ('@/views/schoolManage/index'),
-        //             meta: { title: '学校管理', icon: 'table' }
-        //         },
-
-        //     ]
-        // },
-        // { path: '*', redirect: '/404', hidden: true },
-        // { path: '*', redirect: '/403', hidden: true },
     ]
 
 })
@@ -261,6 +107,7 @@ router.beforeEach((to, from, next) => {
     var time = localStorage.getItem('loginTime');
     var nowTime = new Date().getTime();
     let token = localStorage.getItem('Authorization');
+
     if (whiteList.indexOf(to.path) < 0) { //访问了需要登录才能访问的页面
         if (isLogin === true && nowTime <= time + 2592000000 && token != null && token != '') { //登录过来直接进去，30天内登录不需要重新登录
             next();
@@ -278,6 +125,7 @@ router.beforeEach((to, from, next) => {
     } else {
         next();
     }
+
 });
 
 function routerGo() {
