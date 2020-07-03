@@ -469,7 +469,7 @@ export default {
         });
       }
     },
-    showMenuData(page) {
+    showMenuData(page) {     
       this.list = [];
       this.listLoading = true;
       this.page = page;
@@ -477,6 +477,9 @@ export default {
       var data = {
         page: this.page
       };
+       this.$http.get("/api/menus").then(res => {
+                    localStorage.setItem("menuList", JSON.stringify(res.data));
+                  });
       this.$http.get("/api/menus?page=" + page).then(res => {
         this.listLoading = false;
         this.totalNum = res.data.total;
@@ -566,7 +569,6 @@ export default {
         if (valid) {
           this.dialogFormVisible = false;
           if (this.title == "新增菜单") {
-            console.log(addData);
             this.$http.post("/api/menus", addData).then(res => {
               if (res.data.respCode == "1") {
                 this.$alert("菜单新增成功", "成功", {
@@ -590,13 +592,13 @@ export default {
           } else {
             this.$http.patch("/api/menus", data).then(res => {
               if (res.data.respCode == "1") {
+                this.$http.get("/api/menus").then(res => {
+                    localStorage.setItem("menuList", JSON.stringify(res.data));
+                  });
                 this.$alert("菜单修改成功", "成功", {
                   confirmButtonText: "确定"
                 }).then(() => {
                   this.listLoading = true;
-                  this.$http.get("/api/menus").then(res => {
-                    localStorage.setItem("menuList", JSON.stringify(res.data));
-                  });
                   location.reload();
                   this.showMenuData(this.page);
                 });
