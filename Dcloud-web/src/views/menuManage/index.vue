@@ -327,40 +327,39 @@ export default {
             this.listLoading = false;
             this.totalNum = res.data.total;
             if (this.totalNum != 0) {
-          this.list = res.data.records;
-          var data = res.data.records;
-               function toTree(data) {
-            data.forEach(function(item) {
-              delete item.children;
-            });
-            var map = {};
-            data.forEach(function(item) {
-              map[item.id] = item;
-            });
-            // console.log(map);
-            var val = [];
-            data.forEach(function(item) {
-              var parent = map[item.parentId];
-              if (parent) {
-                (parent.children || (parent.children = [])).push(item);
-              } else {
-                val.push(item);
+              this.list = res.data.records;
+              var data = res.data.records;
+              function toTree(data) {
+                data.forEach(function(item) {
+                  delete item.children;
+                });
+                var map = {};
+                data.forEach(function(item) {
+                  map[item.id] = item;
+                });
+                // console.log(map);
+                var val = [];
+                data.forEach(function(item) {
+                  var parent = map[item.parentId];
+                  if (parent) {
+                    (parent.children || (parent.children = [])).push(item);
+                  } else {
+                    val.push(item);
+                  }
+                });
+                return val;
               }
-            });
-            return val;
-          }
-          this.list = toTree(data);
-          for (var i = 0; i < this.list.length; i++) {
-            if (this.list[i].parentId == 0) {
-              this.list[i].parentId = "无";
-            }
-            if (this.list[i].children != null) {
-              for (var j = 0; j < this.list[i].children.length; j++) {
-                this.list[i].children[j].parentId = this.list[i].name;
+              this.list = toTree(data);
+              for (var i = 0; i < this.list.length; i++) {
+                if (this.list[i].parentId == 0) {
+                  this.list[i].parentId = "无";
+                }
+                if (this.list[i].children != null) {
+                  for (var j = 0; j < this.list[i].children.length; j++) {
+                    this.list[i].children[j].parentId = this.list[i].name;
+                  }
+                }
               }
-            }
-          }
-          console.log(this.list)
             }
           });
       } else {
@@ -499,7 +498,7 @@ export default {
         });
       }
     },
-    showMenuData(page) {     
+    showMenuData(page) {
       this.list = [];
       this.listLoading = true;
       this.page = page;
@@ -507,13 +506,12 @@ export default {
       var data = {
         page: this.page
       };
-       this.$http.get("/api/menus").then(res => {
-                    localStorage.setItem("menuList", JSON.stringify(res.data));
-                  });
+      this.$http.get("/api/menus").then(res => {
+        localStorage.setItem("menuList", JSON.stringify(res.data));
+      });
       this.$http.get("/api/menus?page=" + page).then(res => {
         this.listLoading = false;
         this.totalNum = res.data.total;
-        console.log(res.data)
         if (this.totalNum != 0) {
           delete res.data[0];
           this.list = res.data.records;
@@ -619,8 +617,8 @@ export default {
             this.$http.patch("/api/menus", data).then(res => {
               if (res.data.respCode == "1") {
                 this.$http.get("/api/menus").then(res => {
-                    localStorage.setItem("menuList", JSON.stringify(res.data));
-                  });
+                  localStorage.setItem("menuList", JSON.stringify(res.data));
+                });
                 this.$alert("菜单修改成功", "成功", {
                   confirmButtonText: "确定"
                 }).then(() => {
@@ -643,7 +641,7 @@ export default {
       this.dialogFormVisible = false;
       this.$refs[formName].resetFields();
       this.reset();
-       this.showMenuData(this.page);
+      this.showMenuData(this.page);
     },
     handleCurrentChange(val) {
       this.page = val;
