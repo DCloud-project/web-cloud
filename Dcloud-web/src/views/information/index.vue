@@ -23,7 +23,7 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>-->
           <!-- </el-form-item> -->
-          <el-form-item label="账号">
+          <el-form-item label="账号/邮箱">
             <el-input v-model="ruleForm.email" disabled></el-input>
           </el-form-item>
           <el-form-item label="名称" prop="name">
@@ -114,11 +114,15 @@ export default {
       }
     };
     var validatePass = (rule, value, callback) => {
+      var pattern=/^(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^[^\s\u4e00-\u9fa5]{6,16}$/
       if (value === "") {
         callback(new Error("请输入密码"));
       } else {
-        if (this.ruleForm2.checkPass !== "") {
-          this.$refs.ruleForm2.validateField("checkPass");
+        // if (this.loginForm.checkPass !== "") {
+        //   this.$refs.loginForm.validateField("checkPass");
+        // }
+        if(!pattern.exec(value)){
+           callback(new Error("6-16位，由数字、英文、符号三种类型构成，至少包含两种类型字符"));
         }
         callback();
       }
@@ -181,8 +185,8 @@ export default {
     };
   },
   created() {
+     this.showSchool();
     this.showUserInfo();
-    this.showSchool();
   },
   methods: {
     showUserInfo() {
@@ -199,6 +203,8 @@ export default {
             if (res.data.school != "" && res.data.school != "0") {
               this.ruleForm.school = res.data.school.split("/"); //字符分割
             }
+            
+            console.log( this.ruleForm.school);
             this.ruleForm.birth = res.data.birth;
             this.ruleForm.phone = res.data.telphone;
             this.ruleForm.exp = res.data.exp;
@@ -240,6 +246,10 @@ export default {
             res => {
               if (res.data.respCode == "1") {
                 this.$alert("用户信息修改成功", "成功", {
+                  confirmButtonText: "确定"
+                });
+              }else{
+                this.$alert(res.data.respCode, "失败", {
                   confirmButtonText: "确定"
                 });
               }

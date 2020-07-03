@@ -81,11 +81,15 @@
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
+      var pattern=/^(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^[^\s\u4e00-\u9fa5]{6,16}$/
       if (value === "") {
         callback(new Error("请输入密码"));
       } else {
-        if (this.loginForm.checkPass !== "") {
-          this.$refs.loginForm.validateField("checkPass");
+        // if (this.loginForm.checkPass !== "") {
+        //   this.$refs.loginForm.validateField("checkPass");
+        // }
+        if(!pattern.exec(value)){
+           callback(new Error("6-16位，由数字、英文、符号三种类型构成，至少包含两种类型字符"));
         }
         callback();
       }

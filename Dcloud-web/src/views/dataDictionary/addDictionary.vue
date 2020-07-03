@@ -146,7 +146,9 @@ export default {
         name: [{ required: true, message: "请输入文本", trigger: "blur" }]
       },
       isEdit: false,
-      dic: []
+      dic: [],
+      index: 0,
+      row: []
     };
   },
   created() {
@@ -181,40 +183,57 @@ export default {
     },
     deleteItem(row) {
       //删除数据项
+      this.row = row;
       for (var i in this.list) {
-        if (this.list[i].value == row.value) {
+        if (
+          (this.list[i].index == this.row.index &&
+            this.list[i].index != null &&
+            this.list[i].index != undefined &&
+            this.row.index != null &&
+            this.row.index != undefined) ||
+          (this.list[i].id == this.row.id &&
+            this.list[i].id != null &&
+            this.list[i].id != undefined &&
+            this.row.id != null &&
+            this.row.id != undefined)
+        ) {
           this.list.splice(i, 1);
           break;
         }
       }
-      var data = [];
-      data.push(row.id);
-      this.$http.delete("/api/dictionaries?del_list=" + data).then(
-        res => {
-          if (res.data.respCode == "1") {
-            this.$alert("数据项删除成功", "成功", {
-              confirmButtonText: "确定"
-            });
-          } else {
-            this.$alert(res.data.respCode, "失败", {
-              confirmButtonText: "确定"
+
+      if (row.id != null && row.id != undefined) {
+        var data = [];
+        console.log(row);
+        data.push(row.id);
+        this.$http.delete("/api/dictionaries?del_list=" + data).then(
+          res => {
+            if (res.data.respCode == "1") {
+              this.$alert("数据项删除成功", "成功", {
+                confirmButtonText: "确定"
+              });
+            } else {
+              this.$alert(res.data.respCode, "失败", {
+                confirmButtonText: "确定"
+              });
+            }
+          },
+          res => {
+            this.$router.push({
+              path: "/" + res
             });
           }
-        },
-        res => {
-          this.$router.push({
-            path: "/" + res
-          });
-        }
-      );
+        );
+      }
     },
     editItem(row) {
       //修改数据项
-      console.log(row);
+      this.row = row;
       this.itemForm.value = parseInt(row.value);
       this.itemForm.name = row.name;
       this.itemForm.isDefault = row.isDefault.toString();
       this.dialogFormVisible = true;
+      this.index = row.index;
       this.title = "修改数据项";
     },
     addItem() {
@@ -233,11 +252,24 @@ export default {
             this.list.push({
               value: this.itemForm.value,
               name: this.itemForm.name,
-              isDefault: this.itemForm.isDefault
+              isDefault: this.itemForm.isDefault,
+              index: this.list.length
             });
+            console.log(this.list);
           } else {
             for (var i in this.list) {
-              if (this.list[i].value == this.itemForm.value) {
+              if (
+                (this.list[i].index == this.row.index &&
+                  this.list[i].index != null &&
+                  this.list[i].index != undefined &&
+                  this.row.index != null &&
+                  this.row.index != undefined) ||
+                (this.list[i].id == this.row.id &&
+                  this.list[i].id != null &&
+                  this.list[i].id != undefined &&
+                  this.row.id != null &&
+                  this.row.id != undefined)
+              ) {
                 this.list[i].name = this.itemForm.name;
                 this.list[i].isDefault = this.itemForm.isDefault;
                 break;

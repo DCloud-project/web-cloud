@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     showAuthorityList() {
-      var roleId = localStorage.getItem("roleId");
+      var roleId = parseInt(localStorage.getItem("roleId"));
       this.$http.get("/api/rolePower?role_id=" + roleId).then(res => {
         localStorage.setItem("authority", JSON.stringify(res.data));
       });
